@@ -4,8 +4,6 @@ The Impersonator Shell aims to be a viable combination of two widely used hacker
 
 ## Technical Details About The Impersonator Shell
 
-TBD
-
 ### Shells and Reverse Shells with Netcat
 
 TBD
@@ -17,6 +15,11 @@ TBD
 ### EDR Capabilities
 
 TBD
+
+### Drawbacks
+
+TBD
+
 
 ## Contribution Guidelines
 
