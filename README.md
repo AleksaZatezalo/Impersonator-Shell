@@ -1,6 +1,6 @@
 # Impersonator Shell
 
-The Impersonator Shell aims to be a viable combination of two widely used hacker tools, netcat and the juicy potato exploit with additional EDR evasion capabilities. The binary is named after the Windows privilege that Juicy Potato exploit uses to get administrative access, the SeImpersonate Privilege. It aims to provide security engineers with a administrative shell when running within the context of of a user who has the SeImpersonate Privelege enabled. 
+The Impersonator Shell aims to be a viable combination of two widely used hacker tools, netcat and the print spoofer exploit with additional EDR evasion capabilities. The binary is named after the Windows privilege that print spoofer exploit uses to get administrative access, the SeImpersonate Privilege. It aims to provide security engineers with a administrative shell when running within the context of of a user who has the SeImpersonate Privelege enabled. 
 
 ## Contribution Guidelines
 
