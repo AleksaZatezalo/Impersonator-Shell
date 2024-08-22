@@ -4,11 +4,19 @@ The Impersonator Shell aims to be a viable combination of two widely used hacker
 
 ## Technical Details About The Impersonator Shell
 
-TO BE COMPLETE AFTER THE END OF THE PROJECT. Add Apache Tomcat, IIS 6.0, and Windows versions it has been tested on.
+TBD
+
+### Shells and Reverse Shells with Netcat
+
+TBD
+
+### The Print Spoofer Exploit
+
+TBD
 
 ### EDR Capabilities
 
-TO BE COMPLETE AFTER THE END OF THE PROJECT. Link Evading EDR Book.
+TBD
 
 ## Contribution Guidelines
 
