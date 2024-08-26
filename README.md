@@ -40,3 +40,9 @@ A list of known issues and features that are currently being addressed are maint
 
 If you have benefited from this project and use Monero please consider donanting to the following address:
 47RoH3K4j8STLSh8ZQ2vUXZdh7GTK6dBy7uEBopegzkp6kK4fBrznkKjE3doTamn3W7A5DHbWXNdjaz2nbZmSmAk8X19ezQ
+
+## References
+
+[Netcat for windows](https://github.com/diegocr/netcat)
+[Printspoofer](https://github.com/itm4n/PrintSpoofer)
+[Evading EDR The Definitive Guide to Defeating Endpoint Detection Systems](https://www.amazon.ca/Evading-EDR-Definitive-Defeating-Detection/dp/1718503342)
