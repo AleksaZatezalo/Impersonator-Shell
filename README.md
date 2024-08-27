@@ -44,5 +44,7 @@ If you have benefited from this project and use Monero please consider donanting
 ## References
 
 [Netcat for windows](https://github.com/diegocr/netcat)
+
 [Printspoofer](https://github.com/itm4n/PrintSpoofer)
+
 [Evading EDR The Definitive Guide to Defeating Endpoint Detection Systems](https://www.amazon.ca/Evading-EDR-Definitive-Defeating-Detection/dp/1718503342)
