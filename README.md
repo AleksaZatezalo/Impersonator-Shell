@@ -2,7 +2,13 @@
 
 The Impersonator Shell aims to be a viable combination of two widely used hacker tools, netcat and the print spoofer exploit with additional EDR evasion capabilities. The binary is named after the Windows privilege that print spoofer exploit uses to get administrative access, the SeImpersonate Privilege. It aims to provide security engineers with a administrative shell when running within the context of of a user who has the SeImpersonate Privelege enabled.
 
+## Impersonator Shell? Why Bother?
+
+TBD
+
 ## Technical Details About The Impersonator Shell
+
+TBD (effectivley 2 in 1 means lots of fun).
 
 ### Creating Shells
 
@@ -17,10 +23,6 @@ TBD
 TBD
 
 ### Drawbacks and Potential Additions
-
-TBD
-
-## Impersonator Shell? Why Bother?
 
 TBD
 
