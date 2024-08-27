@@ -4,11 +4,11 @@ The Impersonator Shell aims to be a viable combination of two widely used hacker
 
 ## Technical Details About The Impersonator Shell
 
-### Shells and Reverse Shells with Netcat
+### Creating Shells Like Netcat
 
 TBD
 
-### The Print Spoofer Exploit
+### Abusing SEImpersonatePrivelege
 
 TBD
 
@@ -16,7 +16,7 @@ TBD
 
 TBD
 
-### Drawbacks
+### Drawbacks and Potential Additions
 
 TBD
 
