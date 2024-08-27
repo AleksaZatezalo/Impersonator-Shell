@@ -1,4 +1,9 @@
-/* A simple server created in C. The port number is passed as an argument.*/
+/*
+ * Author: Aleksa Zatezalo 
+ * Date: August 2024
+ * Description: A tcp listener that executes commands.
+*/
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
