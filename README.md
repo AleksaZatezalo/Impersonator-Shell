@@ -4,7 +4,7 @@ The Impersonator Shell aims to be a viable combination of two widely used hacker
 
 ## Technical Details About The Impersonator Shell
 
-### Creating Shells Like Netcat
+### Creating Shells
 
 TBD
 
