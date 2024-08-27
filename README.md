@@ -20,6 +20,9 @@ TBD
 
 TBD
 
+## Impersonator Shell? Why Bother?
+
+TBD
 
 ## Contribution Guidelines
 
