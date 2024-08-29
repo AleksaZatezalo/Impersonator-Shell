@@ -9,6 +9,12 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#define RESET   "\033[0m"       /* Black */
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
 void error(char *msg){
     perror(msg);
     exit(1);
@@ -34,13 +40,16 @@ int main(int argc, char *argv[]){
     if (bind(sockfd, (struct sockaddr *) &serv_addr,
              sizeof(serv_addr)) < 0) 
              error("ERROR on binding");
-    
     listen(sockfd,5);
+    printf( GREEN "[+]" RESET );
+    printf(" Socket opened.\n");
+
     clilen = sizeof(cli_addr);
     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
     if (newsockfd < 0) 
         error("ERROR on accept");
-
+    printf( GREEN "[+]" RESET );
+    printf(" Connection accepted. \n");
     bzero(buffer,256);
     n = read(newsockfd,buffer,255);
     if (n < 0) error("ERROR reading from socket");
