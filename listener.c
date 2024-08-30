@@ -5,26 +5,43 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
 #define RESET   "\033[0m"       /* Black */
-#define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
 #define GREEN   "\033[32m"      /* Green */
 #define YELLOW  "\033[33m"      /* Yellow */
 
+
+/* Print to screen functions */
 void error(char *msg){
     perror(msg);
-    exit(1);
+    exit(0);
 }
 
 void success(char *msg){
-    printf( GREEN "[+]" RESET );
-    printf(msg+"\n");
+    printf( GREEN "[+] " RESET );
+    printf(msg);
+    printf("\n");
 }
 
+void warn(char *msg){
+    printf(YELLOW "[-] " RESET );
+    printf(msg);
+    printf("\n");
+}
+
+void bad(char *msg){
+    printf(RED "[!] " RESET );
+    printf(msg);
+    printf("\n");
+}
+
+
+/* Socket functions */
 int main(int argc, char *argv[]){
     int sockfd, newsockfd, portno, clilen;
     char buffer[256];
@@ -34,8 +51,9 @@ int main(int argc, char *argv[]){
     if (argc < 2) {
         fprintf(stderr, "ERROR, no port provided\n");
     }
-
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+
     if (sockfd < 0)
         error("ERROR opening socket");
     bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -47,7 +65,6 @@ int main(int argc, char *argv[]){
              error("ERROR on binding");
     listen(sockfd,5);
     
-    success("Socket Opened");
     clilen = sizeof(cli_addr);
     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
     if (newsockfd < 0) 
