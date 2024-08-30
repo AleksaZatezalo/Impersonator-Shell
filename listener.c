@@ -20,6 +20,11 @@ void error(char *msg){
     exit(1);
 }
 
+void success(char *msg){
+    printf( GREEN "[+]" RESET );
+    printf(msg+"\n");
+}
+
 int main(int argc, char *argv[]){
     int sockfd, newsockfd, portno, clilen;
     char buffer[256];
@@ -41,15 +46,13 @@ int main(int argc, char *argv[]){
              sizeof(serv_addr)) < 0) 
              error("ERROR on binding");
     listen(sockfd,5);
-    printf( GREEN "[+]" RESET );
-    printf(" Socket opened.\n");
-
+    
+    success("Socket Opened");
     clilen = sizeof(cli_addr);
     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
     if (newsockfd < 0) 
         error("ERROR on accept");
-    printf( GREEN "[+]" RESET );
-    printf(" Connection accepted. \n");
+    success("Connection accepted");
     bzero(buffer,256);
     n = read(newsockfd,buffer,255);
     if (n < 0) error("ERROR reading from socket");
