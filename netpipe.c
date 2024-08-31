@@ -1,3 +1,9 @@
+/*
+* Author: Aleksa Zatezalo
+* Date: September 2023
+* Description: Netpipe is a C program that allows for bi-directional socket communication. 
+*/
+
 #include <netdb.h>
 #include <pthread.h>
 #include <stdio.h>
