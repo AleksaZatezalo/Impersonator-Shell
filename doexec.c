@@ -4,7 +4,7 @@
 * Description: Doexec is a C program that executes provided commands in terminal and returns output. 
 */
 
-#include <stdio.h>
+#include "doexec.h"
 #include <stdlib.h>
 #include <string.h>
 
