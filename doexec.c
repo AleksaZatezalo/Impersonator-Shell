@@ -29,8 +29,3 @@ void doexec(char *argv[])
     pclose(fp);
 
 }
-
-int main(int argc, char *argv[])
-{
-    doexec(argv);
-}
