@@ -4,6 +4,8 @@
         "socket.h": "c",
         "stdio.h": "c",
         "stdlib.h": "c",
-        "netpipe.h": "c"
+        "netpipe.h": "c",
+        "doexec.h": "c",
+        "string.h": "c"
     }
 }

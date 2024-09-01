@@ -8,27 +8,29 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_CMD_LEN 100
-
-int doexec(int argc, char *argv[])
+void doexec(char *argv[])
 {
     char cmd[MAX_CMD_LEN] = "", **p;
+    FILE *fp,*outputfile;
+    char var[40];
 
-    if (argc < 2) /*No command specified.*/
+    strcat(cmd, argv[1]);
+    for (p = &argv[2]; *p; p++)
     {
-        fprintf(stderr, "Usage: ./program_name terminal_command");
+        strcat(cmd, " ");
+        strcat(cmd, *p);
     }
 
-    else
+    fp = popen(cmd, "r");
+    while (fgets(var, sizeof(var), fp) != NULL) 
     {
-        strcat(cmd, argv[1]);
-        for (p = &argv[2]; *p; p++)
-        {
-            strcat(cmd, " ");
-            strcat(cmd, *p);
-        }
-        system(cmd);
+        printf("%s", var);
     }
+    pclose(fp);
 
-    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    doexec(argv);
 }
