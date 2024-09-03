@@ -42,11 +42,3 @@ char* doexec(char *argv[])
     return exec;
 
 }
-
-// Remove main func after you are done testing
-// Change argv of doexec after removing main
-int main(int argc, char *argv[]){
-    char *command = doexec(argv);
-    printf(command);
-    return 0;
-}
