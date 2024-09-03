@@ -34,8 +34,8 @@ char* doexec(char *argv[])
 
     while (fgets(var, sizeof(var), fp) != NULL) 
     {
-        int size = sizeof(exec)+ sizeof(var);
-        exec = realloc(exec, size + 41);
+        int size = (strlen(exec)+ strlen(var)) * sizeof(char);
+        exec = realloc(exec, size );
         strcat(exec, var); 
     }
     pclose(fp);
