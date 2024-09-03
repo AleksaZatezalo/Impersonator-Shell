@@ -6,6 +6,7 @@
         "stdlib.h": "c",
         "netpipe.h": "c",
         "doexec.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "charconv": "c"
     }
 }

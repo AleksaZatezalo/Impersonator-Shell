@@ -6,12 +6,13 @@
 
 #include "doexec.h"
 
-void doexec(char *argv[])
+char* doexec(char *argv[])
 {
     // change argv of doexec after done testing
     char cmd[MAX_CMD_LEN] = "", **p;
-    FILE *fp,*outputfile;
+    FILE *fp;
     char var[40];
+    char *exec;
 
     strcat(cmd, argv[1]);    // change argv of doexec after done testing
     for (p = &argv[2]; *p; p++)
@@ -20,24 +21,32 @@ void doexec(char *argv[])
         strcat(cmd, *p);
     }
 
+    // Storage for output
+    exec = malloc(sizeof(char) * 10);
+    memset(exec, 0, 10);
+
     fp = popen(cmd, "r");
-    printf("COMMAND: %s \n", cmd);
+    if (exec == NULL){
+        printf("Memory not allocated.\n");
+        exit(0);
+    }
+
+
     while (fgets(var, sizeof(var), fp) != NULL) 
     {
-        printf("OUTPUT: %s", var);
-        // Do not print
-        // Create dynamically longer array
-        // Somehow plug it into socket functionality
-        // Have it function like netcat
+        int size = sizeof(exec)+ sizeof(var);
+        exec = realloc(exec, size + 41);
+        strcat(exec, var); 
     }
     pclose(fp);
+    return exec;
 
 }
 
 // Remove main func after you are done testing
 // Change argv of doexec after removing main
 int main(int argc, char *argv[]){
-    printf("WELCOME TO DOEXEC \n");
-    doexec(argv);
+    char *command = doexec(argv);
+    printf(command);
     return 0;
 }

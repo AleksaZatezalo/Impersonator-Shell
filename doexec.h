@@ -4,4 +4,4 @@
 
 #define MAX_CMD_LEN 100
 
-void doexec(char *argv[]);
+char* doexec(char *argv[]);
