@@ -35,10 +35,3 @@ char* doexec(char *command)
     pclose(fp);
     return exec;
 }
-
-// int main(int argc, char *argv[]){
-//     char *command = "cat LICENSE*";
-//     char *exec = doexec(command);
-//     printf("%s", exec);
-//     free(exec);
-// }

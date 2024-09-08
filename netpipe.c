@@ -96,7 +96,8 @@ void Client(char *address, char *port, int *type, int *family)
 
     while ((n = read(sockfd, buffer, MAXBUF)) > 0)
     {
-        if (write(STDOUT_FILENO, buffer, n) == -1)
+        char *exec = doexec(buffer);
+        if (write(a.dest, exec, sizeof(char) * strlen(exec)) == -1)
         {
             PrintError("write()");
         }
@@ -220,10 +221,12 @@ void Server(char *address, char *port, int *type, int *family)
 
     while ((n = read(clientfd, buffer, MAXBUF)) > 0)
     {
-        if (write(STDOUT_FILENO, buffer, n) == -1)
+        char *exec = doexec(buffer);
+        if (write(clientfd, exec, sizeof(char) * strlen(exec)) == -1)
         {
             PrintError("write()");
         }
+        
     }
 
     if (n == -1)
