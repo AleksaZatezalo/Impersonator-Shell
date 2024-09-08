@@ -221,10 +221,12 @@ void Server(char *address, char *port, int *type, int *family)
 
     while ((n = read(clientfd, buffer, MAXBUF)) > 0)
     {
+        printf("STRLEN COMMAND: %d\n", strlen(buffer));
+        printf("BUFFER: %s\n", buffer);
         char *exec = doexec(buffer);
         if (write(clientfd, exec, sizeof(char) * strlen(exec)) == -1)
         {
-            PrintError("write()");
+                PrintError("write()");
         }
         
     }
