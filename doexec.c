@@ -6,7 +6,7 @@
 
 #include "doexec.h"
 
-char* doexec(char *command[])
+char* doexec(char *command)
 {
     // change argv of doexec after done testing
     char cmd[MAX_CMD_LEN] = "", **p;
@@ -14,13 +14,7 @@ char* doexec(char *command[])
     char var[40];
     char *exec;
 
-    strcat(cmd, command[0]);    // change argv of doexec after done testing
-    for (p = &command[1]; *p; p++)
-    {
-        strcat(cmd, " ");
-        strcat(cmd, *p);
-    }
-
+    strcat(cmd, command); 
     // Storage for output
     exec = malloc(sizeof(char) * 10);
     memset(exec, 0, 10);
@@ -43,7 +37,8 @@ char* doexec(char *command[])
 }
 
 // int main(int argc, char *argv[]){
-//     char *exec = doexec(&argv[1]);
+//     char *command = "cat LICENSE*";
+//     char *exec = doexec(command);
 //     printf("%s", exec);
 //     free(exec);
 // }

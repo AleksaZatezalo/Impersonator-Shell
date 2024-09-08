@@ -4,4 +4,4 @@
 
 #define MAX_CMD_LEN 100
 
-char* doexec(char *command[]);
+char* doexec(char *command);
