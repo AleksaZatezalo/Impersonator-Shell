@@ -4,27 +4,13 @@ The Impersonator Shell aims to be a viable combination of two widely used hacker
 
 ## Impersonator Shell? Why Bother?
 
-TBD
+Things to fill out:
 
-## Technical Details About The Impersonator Shell
-
-TBD (effectivley 2 in 1 means lots of fun).
-
-### Creating Shells
-
-TBD
-
-### Abusing SEImpersonatePrivelege
-
-TBD
-
-### EDR Capabilities
-
-TBD
-
-### Drawbacks and Potential Additions
-
-TBD
+* Many users running windows servers have this priv enabled.
+* Is this a default priv? Confirm or deny.
+* As per this tutoriral (SeImpersonatePrivilege – Windows Privilege Escalation)[https://juggernaut-sec.com/seimpersonateprivilege/] users need to upload shell code, and a juicy potato exploit. Then updrage to admin rights.
+* It might be simpler just to drop one payload in.
+* Inbuilt EDR techniques for evading microsoft defender
 
 ## Contribution Guidelines
 
@@ -48,8 +34,14 @@ If you have benefited from this project and use Monero please consider donanting
 
 ## References
 
+[Build Your Own Shell (BYOS) Project](https://github.com/AleksaZatezalo/BYOS)
+
+[Understanding and Abusing Process Tokens — Part I](https://securitytimes.medium.com/understanding-and-abusing-process-tokens-part-i-ee51671f2cfa)
+
+[Understanding and Abusing Process Tokens — Part II](https://securitytimes.medium.com/understanding-and-abusing-access-tokens-part-ii-b9069f432962)
+
+[Bypassing Defender on modern Windows 10 systems](https://www.purpl3f0xsecur1ty.tech/2021/03/30/av_evasion.html)
+
 [Printspoofer](https://github.com/itm4n/PrintSpoofer)
 
 [Evading EDR The Definitive Guide to Defeating Endpoint Detection Systems](https://www.amazon.ca/Evading-EDR-Definitive-Defeating-Detection/dp/1718503342)
-
-[BYOS](https://github.com/AleksaZatezalo/BYOS)

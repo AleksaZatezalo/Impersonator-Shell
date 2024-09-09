@@ -7,6 +7,20 @@
 #include "doexec.h"
 #include "netpipe.h"
 
+/*
+* TO DO
+* 1. Import Header & Make It Colorful
+* 2. Compile on Windows VM & Test
+* 3. Automatic `whoami /priv`
+* 4. Implements Priv Esc attack If Priv
+* 5. Inbuilt Connection With MSF
+* 6. Inbuild enumeration tool
+* 7. Inbuild EDR techniques
+* 8. Create demo
+* 9. Create video
+* 10. Share with red teamers
+*/
+
 int main(int argc, char **argv)
 {
     int c, protocol = SOCK_STREAM, listen = 0, family = AF_UNSPEC;
