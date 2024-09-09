@@ -9,6 +9,7 @@
 
 /*
 * TO DO
+* 0. Proper Make File
 * 1. Import Header & Make It Colorful
 * 2. Compile on Windows VM & Test
 * 3. Automatic `whoami /priv`
