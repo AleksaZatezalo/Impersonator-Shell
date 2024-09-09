@@ -224,7 +224,6 @@ void Server(char *address, char *port, int *type, int *family)
 
     while ((n = read(clientfd, buffer, MAXBUF)) > 0)
     {
-        printf("BUFF: %s", buffer);
         char *exec = doexec(buffer);
         if (write(clientfd, exec, sizeof(char) * strlen(exec)) == -1)
         {
