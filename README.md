@@ -4,13 +4,7 @@ The Impersonator Shell aims to be a viable combination of two widely used hacker
 
 ## Impersonator Shell? Why Bother?
 
-Things to fill out:
-
-* Many users running windows servers have this priv enabled.
-* Is this a default priv? Confirm or deny.
-* As per this tutoriral (SeImpersonatePrivilege – Windows Privilege Escalation)[https://juggernaut-sec.com/seimpersonateprivilege/] users need to upload shell code, and a juicy potato exploit. Then updrage to admin rights.
-* It might be simpler just to drop one payload in.
-* Inbuilt EDR techniques for evading microsoft defender
+In many cases security engineers who have obtained  RCE on a Windows Server look to create a reverse-shell (or bind-shell) on the target machine. Many users running a server on a Windows host, such as Apache Tomcat and  Microsoft IIS, will have the `SEImpersonatePriveledge` enabled by default. This means that security engineers who can obtain RCE on a windows server, can also obtain an administrative shell by abusing the server's`SEImpersonatePriveledge`. Instead of uploading an executable like Netcat, opening a reverse shell, and uploading an exploit to abuse the `SEImpersonatePriveledge` just to open another administrative reverse shell, security engineers can simply upload the Impersonator shell. In the event that the `SEImpersonatePriveledge` is disabled security engineers will get a non-administrative shell.
 
 ## Contribution Guidelines
 
@@ -35,6 +29,8 @@ If you have benefited from this project and use Monero please consider donanting
 ## References
 
 [Build Your Own Shell (BYOS) Project](https://github.com/AleksaZatezalo/BYOS)
+
+[SEImpersonatePriveledge](https://learn.microsoft.com/en-us/answers/questions/1087721/how-to-disable-seimpersonate-privilege-for-a-user)
 
 [Understanding and Abusing Process Tokens — Part I](https://securitytimes.medium.com/understanding-and-abusing-process-tokens-part-i-ee51671f2cfa)
 
