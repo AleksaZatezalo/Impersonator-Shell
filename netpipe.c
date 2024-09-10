@@ -18,9 +18,14 @@ typedef struct args
 */
 int header(int sockfd){
 
+    /*print Impersonator*/
     char *print_this = "~|~ _ _  _  _  _ _ _  _  _ _|_ _  _\n _|_| | ||_)(/_| _\\(_)| |(_| | (_)|\n        |    \n";
-
     write(sockfd, print_this, sizeof(char) * strlen(print_this));
+    
+    /*print Shell*/
+    char *print_that = "\n\t\t(~|_  _ ||\n\t\t _)| |(/_||\n";
+    write(sockfd, print_that, sizeof(char) * strlen(print_that));
+
     return 0;
 }
 
@@ -198,9 +203,7 @@ void Server(char *address, char *port, int *type, int *family)
     int serverfd, clientfd, n;
     char buffer[MAXBUF];
     pthread_t printer;
-    socklen_t len;int header(){
-    return 0;
-}
+    socklen_t len;
     struct sockaddr_storage cli;
 
     serverfd = CreateServerSocket(address, port, type, family);
@@ -239,8 +242,7 @@ void Server(char *address, char *port, int *type, int *family)
         PrintError("pthread_create()");
     }
 
-    char *print_this = "~|~ _ _  _  _  _ _ _  _  _ _|_ _  _\n _|_| | ||_)(/_| _\\(_)| |(_| | (_)|\n        |    \n";
-    write(clientfd, print_this, sizeof(char) * strlen(print_this));
+    header(clientfd);
 
     while ((n = read(clientfd, buffer, MAXBUF)) > 0)
     {
