@@ -9,7 +9,6 @@
 
 /*
 * TO DO
-* 1. Import Header & Make It Colorful
 * 2. Compile on Windows VM & Test
 * 3. Automatic `whoami /priv`
 * 4. Implements Priv Esc attack If Priv

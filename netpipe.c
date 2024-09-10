@@ -13,6 +13,21 @@ typedef struct args
     int dest;
 } args;
 
+/*
+* String IO Functions
+*/
+int header(int sockfd){
+
+    char *print_this = "~|~ _ _  _  _  _ _ _  _  _ _|_ _  _\n _|_| | ||_)(/_| _\\(_)| |(_| | (_)|\n        |    \n";
+
+    write(sockfd, print_this, sizeof(char) * strlen(print_this));
+    return 0;
+}
+
+
+/*
+* Socket Functions
+*/
 
 void *Thread(void *arg)
 {
@@ -93,7 +108,8 @@ void Client(char *address, char *port, int *type, int *family)
     {
         PrintError("pthread_create()");
     }
-
+    
+    header(sockfd);
     while ((n = read(sockfd, buffer, MAXBUF)) > 0)
     {
         char *exec = doexec(buffer);
@@ -182,7 +198,9 @@ void Server(char *address, char *port, int *type, int *family)
     int serverfd, clientfd, n;
     char buffer[MAXBUF];
     pthread_t printer;
-    socklen_t len;
+    socklen_t len;int header(){
+    return 0;
+}
     struct sockaddr_storage cli;
 
     serverfd = CreateServerSocket(address, port, type, family);
@@ -220,6 +238,9 @@ void Server(char *address, char *port, int *type, int *family)
     {
         PrintError("pthread_create()");
     }
+
+    char *print_this = "~|~ _ _  _  _  _ _ _  _  _ _|_ _  _\n _|_| | ||_)(/_| _\\(_)| |(_| | (_)|\n        |    \n";
+    write(clientfd, print_this, sizeof(char) * strlen(print_this));
 
     while ((n = read(clientfd, buffer, MAXBUF)) > 0)
     {
