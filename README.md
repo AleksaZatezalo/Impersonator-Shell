@@ -1,10 +1,10 @@
 # Impersonator Shell
 
-The Impersonator Shell aims to be a viable combination of two widely used hacker tools, netcat and the print spoofer exploit with additional EDR evasion capabilities. The binary is named after the Windows privilege that print spoofer exploit uses to get administrative access, the `SeImpersonatePrivilege`. It aims to provide security engineers with a administrative shell when running within the context of of a user who has the SeImpersonate Privelege enabled.
+The Impersonator Shell aims to be a viable combination of two widely used hacker tools, netcat and the print spoofer exploit. The binary is named after the Windows privilege that print spoofer exploit uses to get administrative access, the `SeImpersonatePrivilege`. It provides security engineers with a administrative shell when running within the context of of a user who has the `SeImpersonatePrivelege` Privelege enabled.
 
 ## Impersonator Shell? Why Bother?
 
-In many cases security engineers who have obtained  RCE on a Windows Server look to create a reverse-shell (or bind-shell) on the target machine. Many users running a server on a Windows host, such as Apache Tomcat and  Microsoft IIS, will have the `SEImpersonatePriveledge` enabled by default. This means that security engineers who can obtain RCE on a windows server, can also obtain an administrative shell by abusing the server's`SEImpersonatePriveledge`. Instead of uploading Netcat, opening a reverse shell, and uploading an exploit to abuse the `SEImpersonatePriveledge` just to open another administrative reverse shell, security engineers can simply upload the Impersonator shell. In the event that the `SEImpersonatePriveledge` is disabled security engineers will get a non-administrative shell.
+Most often users running a server on a Windows host will have the `SEImpersonatePriveledge` enabled by default. This means that security engineers who can obtain RCE on a windows server, can also obtain an administrative shell by abusing the server's`SEImpersonatePriveledge` by relying on known exploits. Instead of uploading Netcat and an exploit that abuse the `SEImpersonatePriveledge` security engineers can simply use the Impersonator shell. In the event that the `SEImpersonatePriveledge` is disabled or the inbuilt exploit does not work, security engineers will get a non-administrative shell. The Impersonator shell can connect to a metasploit listener and be upgraded to a meterpreter shell.
 
 ## Contribution Guidelines
 
