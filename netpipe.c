@@ -6,6 +6,7 @@
 
 #include "netpipe.h"
 #include "doexec.h"
+#include <winsock2.h>
 
 typedef struct args
 {
