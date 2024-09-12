@@ -28,6 +28,18 @@ int command_prompt(int sockfd){
     return 0;
 }
 
+void Help(char *name)
+{
+    printf("Usage:\n");
+    printf("\t-u - use udp instead of tcp\n");
+    printf("\t-l - server mode, ADDRESS can be blank, default ip will be used\n");
+    printf("\t-4 - force ip4\n");
+    printf("\t-6 - force ip6\n\n");
+    printf("\t%s [-u -4 -6] ADDRESS PORT\n", name);
+    printf("\t%s -l [-u -4 -6] [ADDRESS] PORT\n", name);
+    exit(0);
+}
+
 int main()
 {
     WSADATA WSAData;
@@ -48,15 +60,23 @@ int main()
 
     char buffer[1024];
     int clientAddrSize = sizeof(clientAddr);
-    while((client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET)
-    {
-        printf("            Client connected!\n");
-        header(client);
-        command_prompt(client);
-        recv(client, buffer, sizeof(buffer), 0);
+    client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize);
+    header(client);
+    command_prompt(client);
+    while (recv(client, buffer, sizeof(buffer), 0)) {
         char *ans = doexec(buffer);
         send(client, ans, strlen(ans) * sizeof(char),0);
-        closesocket(client);
-        printf("Client disconnected.\n");
+        command_prompt(client);
     }
+    // {
+    //     printf("            Client connected!\n");
+    //     header(client);
+    //     command_prompt(client);
+    //     recv(client, buffer, sizeof(buffer), 0);
+    //     char *ans = doexec(buffer);
+    //     send(client, ans, strlen(ans) * sizeof(char),0);
+    //     printf("Client disconnected.\n");
+    // }
+
+    return 0;
 }
