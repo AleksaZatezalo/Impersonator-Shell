@@ -8,31 +8,31 @@
 
 char* doexec(char *command)
 {
-    // change argv of doexec after done testing
-    char cmd[MAX_CMD_LEN] = "", **p;
-    FILE *fp;
-    char var[40];
+    FILE *pPipe;
+    char var[128];
     char *exec;
 
-    strcat(cmd, command); 
-    // Storage for output
+    if ((pPipe = _popen(command, "rt")) == NULL)
+    {
+        exit(1);
+    }
+
     exec = malloc(sizeof(char) * 10);
     memset(exec, 0, 10);
 
-    fp = popen(cmd, "r");
     if (exec == NULL){
         printf("Memory not allocated.\n");
         exit(0);
     }
 
-
-    while (fgets(var, sizeof(var), fp) != NULL) 
+    int size = 0;
+    while (fgets(var, 128, pPipe) != NULL) 
     {
-        int size = (strlen(exec)+ strlen(var)) * sizeof(char);
-        exec = realloc(exec, size );
+        size = size + strlen(var) *sizeof(char) + 1;
+        exec = realloc(exec, size);
         strcat(exec, var); 
     }
-    pclose(fp);
+    feof(pPipe);
+    _pclose(pPipe);
     return exec;
 }
-
