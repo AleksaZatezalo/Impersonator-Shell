@@ -44,19 +44,16 @@ void Help(char *name)
 * Socket Functions
 */
 
-
-int main()
-{
+int server(int port){
     WSADATA WSAData;
     SOCKET server, client;
     SOCKADDR_IN serverAddr, clientAddr;
 
     WSAStartup(MAKEWORD(2,0), &WSAData);
     server = socket(AF_INET, SOCK_STREAM, 0);
-
     serverAddr.sin_addr.s_addr = INADDR_ANY;
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(5555);
+    serverAddr.sin_port = htons(port);
 
     bind(server, (SOCKADDR *)&serverAddr, sizeof(serverAddr));
     listen(server, 0);
@@ -73,15 +70,17 @@ int main()
         send(client, ans, strlen(ans) * sizeof(char),0);
         command_prompt(client);
     }
-    // {
-    //     printf("            Client connected!\n");
-    //     header(client);
-    //     command_prompt(client);
-    //     recv(client, buffer, sizeof(buffer), 0);
-    //     char *ans = doexec(buffer);
-    //     send(client, ans, strlen(ans) * sizeof(char),0);
-    //     printf("Client disconnected.\n");
-    // }
 
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    if(argc < 3){
+        printf("USAGE: .\\impersonator -l -p 4444 \n");
+        printf("USAGE: .\\impersonator -c 192.168.12.12 -p 4444 \n");
+        exit(1);
+    }
+    server(4444);
     return 0;
 }
