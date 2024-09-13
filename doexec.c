@@ -15,7 +15,6 @@ char* doexec(char *command)
 
     command[strlen(command) - 1] = '\0';
     strcat(command, err);
-    printf(command);
     if ((pPipe = _popen(command, "rt")) == NULL)
     {
         exit(1);
