@@ -74,13 +74,35 @@ int server(int port){
     return 0;
 }
 
+int client(char *rhost, int port){
+    printf("TO DO");
+    return port;
+}
+
 int main(int argc, char *argv[])
 {
     if(argc < 3){
-        printf("USAGE: .\\impersonator -l -p 4444 \n");
-        printf("USAGE: .\\impersonator -c 192.168.12.12 -p 4444 \n");
+        printf("USAGE: .\\impersonator --port 4444 \n");
+        printf("USAGE: .\\impersonator --rhost 192.168.12.12 --port 4444 \n");
         exit(1);
     }
-    server(4444);
+    
+    int port;
+    char *rhost = '\0';
+    for (int i = 0; i < argc; i++){
+        if (!strcmp(argv[i], "--port")){
+            port = atoi(argv[i + 1]);
+        }
+        if (!strcmp(argv[i], "--rhost")){
+            rhost = argv[i + 1];
+        }
+    }
+
+    if (rhost){
+        printf("Not servin'\nConnect TO: %s", rhost);
+    } else {
+        server(port);
+    }
+    
     return 0;
 }
