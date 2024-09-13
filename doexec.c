@@ -11,8 +11,11 @@ char* doexec(char *command)
     FILE *pPipe;
     char var[128];
     char *exec;
-    char *err_dir = " 2>&1";
+    char *err = " 2>&1";
 
+    command[strlen(command) - 1] = '\0';
+    strcat(command, err);
+    printf(command);
     if ((pPipe = _popen(command, "rt")) == NULL)
     {
         exit(1);

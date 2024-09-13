@@ -67,6 +67,7 @@ int server(int port){
         char *ans = doexec(buffer);
         send(client, ans, strlen(ans) * sizeof(char),0);
         command_prompt(client);
+        memset(buffer, '\0', sizeof(buffer));
     }
 
     return 0;
@@ -92,6 +93,7 @@ int client(char *rhost, int port){
         char *ans = doexec(buffer);
         send(s, ans, strlen(ans) * sizeof(char),0);
         command_prompt(s);
+        memset(buffer, '\0', sizeof(buffer));
     }
     return 0;
 }
