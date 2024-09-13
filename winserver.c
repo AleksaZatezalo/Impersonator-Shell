@@ -40,6 +40,11 @@ void Help(char *name)
     exit(0);
 }
 
+/*
+* Socket Functions
+*/
+
+
 int main()
 {
     WSADATA WSAData;
