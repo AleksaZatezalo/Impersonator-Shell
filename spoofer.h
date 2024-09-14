@@ -8,4 +8,3 @@
 #include "winserver.h"
 
 int username(int sockfd);
-int findMyProc(const char *procname, int sockfd);
