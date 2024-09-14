@@ -13,7 +13,7 @@ int username(int sockfd){
     send(sockfd, print_this, sizeof(char) * strlen(print_this), 0);
     
     char *whoami = "whoami\r\n";
-    char *name = norm_exec(whoami);
+    char *name = doexec(whoami, 0);
     send(sockfd, name, sizeof(char) * strlen(name), 0);
     free(name);
     return 0;

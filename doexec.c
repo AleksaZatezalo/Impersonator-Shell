@@ -6,45 +6,17 @@
 
 #include "doexec.h"
 
-char* doexec(char *command)
+char* doexec(char *command, int user_input)
 {
     FILE *pPipe;
     char var[128];
     char *exec;
-    char *err = " 2>&1";
 
-    command[strlen(command) - 1] = '\0';
-    strcat(command, err);
-    if ((pPipe = _popen(command, "rt")) == NULL)
-    {
-        exit(1);
+    if (user_input) {
+        char *err = " 2>&1";
+        command[strlen(command) - 1] = '\0';
+        strcat(command, err);
     }
-
-    exec = malloc(sizeof(char) * 10);
-    memset(exec, 0, 10);
-
-    if (exec == NULL){
-        printf("Memory not allocated.\n");
-        exit(0);
-    }
-
-    int size = 0;
-    while (fgets(var, 128, pPipe) != NULL) 
-    {
-        size = size + strlen(var) *sizeof(char) + 1;
-        exec = realloc(exec, size);
-        strcat(exec, var); 
-    }
-    feof(pPipe);
-    _pclose(pPipe);
-    return exec;
-}
-
-char* norm_exec(char *command)
-{
-    FILE *pPipe;
-    char var[128];
-    char *exec;
 
     if ((pPipe = _popen(command, "rt")) == NULL)
     {

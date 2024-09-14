@@ -12,8 +12,6 @@
 /*
 * THINGS TO DO
 * 1. Add Impersonation
-* 2. Clean Up Code
-* 3. Demo To Friends
 */
 int main(int argc, char *argv[]) {
     if(argc < 3){

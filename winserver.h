@@ -1,6 +1,9 @@
 #include <winsock2.h>
 #include <Windows.h>
 #include <stdio.h>
+#include <winsock2.h>
+#include <Windows.h>
+#include <stdio.h>
 #include "doexec.h"
 
 int header(int sockfd);

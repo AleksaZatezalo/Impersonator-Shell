@@ -6,5 +6,4 @@
 
 #define MAX_CMD_LEN 1000
 
-char* doexec(char *command);
-char* norm_exec(char *command);
+char* doexec(char *command, int user_input);
