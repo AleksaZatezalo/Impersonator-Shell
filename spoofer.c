@@ -31,7 +31,7 @@ int username(int sockfd){
 }
 
 // find process ID by process name
-int findMyProc(const char *procname, int sockfd) {
+int findMyProc(const char *procname) {
 
   HANDLE hSnapshot;
   PROCESSENTRY32 pe;
@@ -61,13 +61,5 @@ int findMyProc(const char *procname, int sockfd) {
 
   // closes an open handle (CreateToolhelp32Snapshot)
   CloseHandle(hSnapshot);
-
-  char *print_this = "\r\n\r\n[+] The Process ID Is: ";
-  send(sockfd, print_this, sizeof(char) * strlen(print_this), 0);
-  
-  char *spid;
-  // Convert 123 to string [buf]
-  itoa(pid, spid, 10);
-  send(sockfd, spid, sizeof(int), 0);  
   return pid;
 }
