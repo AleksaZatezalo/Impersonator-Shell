@@ -2,6 +2,8 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <sddl.h>
+#include <stdlib.h>
+#include <strsafe.h>
 #include <userenv.h>
 #include "doexec.h"
 #include "winserver.h"
