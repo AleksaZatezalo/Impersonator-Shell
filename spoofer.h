@@ -1,6 +1,8 @@
 #include <winsock2.h>
 #include <Windows.h>
 #include <stdio.h>
+#include <sddl.h>
+#include <userenv.h>
 #include "doexec.h"
 #include "winserver.h"
 

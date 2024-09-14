@@ -32,7 +32,7 @@ int header(int sockfd){
 int command_prompt(int sockfd){
 
     /*print Impersonator*/
-    char *print_this = "\n[Impersonator Shell]>";
+    char *print_this = "\n[Impersonator Shell]> ";
     send(sockfd, print_this, sizeof(char) * strlen(print_this), 0);
     
     return 0;
