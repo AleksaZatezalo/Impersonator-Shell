@@ -39,3 +39,34 @@ char* doexec(char *command)
     _pclose(pPipe);
     return exec;
 }
+
+char* norm_exec(char *command)
+{
+    FILE *pPipe;
+    char var[128];
+    char *exec;
+
+    if ((pPipe = _popen(command, "rt")) == NULL)
+    {
+        exit(1);
+    }
+
+    exec = malloc(sizeof(char) * 10);
+    memset(exec, 0, 10);
+
+    if (exec == NULL){
+        printf("Memory not allocated.\n");
+        exit(0);
+    }
+
+    int size = 0;
+    while (fgets(var, 128, pPipe) != NULL) 
+    {
+        size = size + strlen(var) *sizeof(char) + 1;
+        exec = realloc(exec, size);
+        strcat(exec, var); 
+    }
+    feof(pPipe);
+    _pclose(pPipe);
+    return exec;
+}

