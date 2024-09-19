@@ -64,85 +64,21 @@ int createProc(char *proc){
     return 0;
 }
 
-// find process ID by process name
-int findMyProc(const char *procname) {
-
-  HANDLE hSnapshot;
-  PROCESSENTRY32 pe;
-  int pid = 0;
-  BOOL hResult;
-
-  // snapshot of all processes in the system
-  hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-  if (INVALID_HANDLE_VALUE == hSnapshot) return 0;
-
-  // initializing size: needed for using Process32First
-  pe.dwSize = sizeof(PROCESSENTRY32);
-
-  // info about first process encountered in a system snapshot
-  hResult = Process32First(hSnapshot, &pe);
-
-  // retrieve information about the processes
-  // and exit if unsuccessful
-  while (hResult) {
-    // if we find the process: return process ID
-    if (strcmp(procname, pe.szExeFile) == 0) {
-      pid = pe.th32ProcessID;
-      break;
+int openProc(char *pid_c){
+    DWORD processId;
+    DWORD PID = atoi(pid_c);
+    HANDLE processHandle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, TRUE, PID);
+    if (GetLastError()){
+        printf("[-] OpenProcess() Return Code: %i\n", processHandle);
+        printf("[-] OpenProcess() Error: %i\n", GetLastError());
+    } else {
+        printf("[+] OpenProcess() success!\n");
     }
-    hResult = Process32Next(hSnapshot, &pe);
-  }
-
-  // closes an open handle (CreateToolhelp32Snapshot)
-  CloseHandle(hSnapshot);
-  OpenProccessToken();
-  return pid;
+    return 0;
 }
 
-// BOOL EnablePrivilege(LPCWSTR privilege) {
-// 	//First lets get the LUID of the provided privilege
-// 	LUID privLuid;
-// 	if (!LookupPrivilegeValue(NULL, privilege, &privLuid)) {
-// 		printf("LookupPrivilegeValue error() : % u\n", GetLastError());
-// 		return false;
-// 	}
-
-// 	//Lets open a handle to our current process
-// 	HANDLE hProcess = GetCurrentProcess();
-// 	//Next open a handle to our token
-// 	HANDLE hToken;
-// 	//Use both TOKEN_QUERY and TOKEN_ADJUST_PRIVILEGES flags, so i can query the Token for information and also be able to adjust its privileges
-// 	if (!OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
-// 		printf("OpenProcessToken() error : % u\n", GetLastError());
-// 		return false;
-// 	}
-	
-// 	//Now lets prepare the structure for the privilege we try to enable
-// 	TOKEN_PRIVILEGES tp;
-// 	tp.PrivilegeCount = 1;
-// 	tp.Privileges[0].Luid = privLuid;
-// 	tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-
-// 	//Finally enable the privilege on our current process
-// 	if (!AdjustTokenPrivileges(hToken, false, &tp, NULL, NULL, NULL)) {
-// 		printf("AdjustTokenPrivileges() error: %u\n", GetLastError());
-// 		return false;
-// 	}
-// 	CloseHandle(hToken);
-// 	CloseHandle(hProcess);
-// 	return true;
-// }
-
-int main( int argc, TCHAR *argv[] )
+int main( int argc, char *argv[] )
 {
-
-    if( argc != 2 )
-    {
-        printf("Usage: %s [cmdline]\n", argv[0]);
-        return 0;
-    }
-
-    createProc(argv[1]);
-    findProc("msedgewebview2.exe");
-    return 0;
+   openProc(argv[1]);
+   return 0;
 }
