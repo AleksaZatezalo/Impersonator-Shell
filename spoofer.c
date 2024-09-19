@@ -31,40 +31,73 @@ int username(int sockfd){
     return 0;
 }
 
+int createProc(char *proc){
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
+
+    ZeroMemory( &si, sizeof(si) );
+    si.cb = sizeof(si);
+    ZeroMemory( &pi, sizeof(pi) );
+
+    // Start the child process. 
+    if( !CreateProcess( NULL,   // No module name (use command line)
+        proc,        // Command line
+        NULL,           // Process handle not inheritable
+        NULL,           // Thread handle not inheritable
+        FALSE,          // Set handle inheritance to FALSE
+        0,              // No creation flags
+        NULL,           // Use parent's environment block
+        NULL,           // Use parent's starting directory 
+        &si,            // Pointer to STARTUPINFO structure
+        &pi )           // Pointer to PROCESS_INFORMATION structure
+    ) 
+    {
+        printf( "CreateProcess failed (%d).\n", GetLastError() );
+    }
+
+    // Wait until child process exits.
+    WaitForSingleObject( pi.hProcess, INFINITE );
+
+    // Close process and thread handles. 
+    CloseHandle( pi.hProcess );
+    CloseHandle( pi.hThread );
+    return 0;
+}
+
 // find process ID by process name
-// int findMyProc(const char *procname) {
+int findMyProc(const char *procname) {
 
-//   HANDLE hSnapshot;
-//   PROCESSENTRY32 pe;
-//   int pid = 0;
-//   BOOL hResult;
+  HANDLE hSnapshot;
+  PROCESSENTRY32 pe;
+  int pid = 0;
+  BOOL hResult;
 
-//   // snapshot of all processes in the system
-//   hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-//   if (INVALID_HANDLE_VALUE == hSnapshot) return 0;
+  // snapshot of all processes in the system
+  hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+  if (INVALID_HANDLE_VALUE == hSnapshot) return 0;
 
-//   // initializing size: needed for using Process32First
-//   pe.dwSize = sizeof(PROCESSENTRY32);
+  // initializing size: needed for using Process32First
+  pe.dwSize = sizeof(PROCESSENTRY32);
 
-//   // info about first process encountered in a system snapshot
-//   hResult = Process32First(hSnapshot, &pe);
+  // info about first process encountered in a system snapshot
+  hResult = Process32First(hSnapshot, &pe);
 
-//   // retrieve information about the processes
-//   // and exit if unsuccessful
-//   while (hResult) {
-//     // if we find the process: return process ID
-//     if (strcmp(procname, pe.szExeFile) == 0) {
-//       pid = pe.th32ProcessID;
-//       break;
-//     }
-//     hResult = Process32Next(hSnapshot, &pe);
-//   }
+  // retrieve information about the processes
+  // and exit if unsuccessful
+  while (hResult) {
+    // if we find the process: return process ID
+    if (strcmp(procname, pe.szExeFile) == 0) {
+      pid = pe.th32ProcessID;
+      break;
+    }
+    hResult = Process32Next(hSnapshot, &pe);
+  }
 
-//   // closes an open handle (CreateToolhelp32Snapshot)
-//   CloseHandle(hSnapshot);
-//   OpenProccessToken()
-//   return pid;
-// }
+  // closes an open handle (CreateToolhelp32Snapshot)
+  CloseHandle(hSnapshot);
+  OpenProccessToken();
+  return pid;
+}
 
 // BOOL EnablePrivilege(LPCWSTR privilege) {
 // 	//First lets get the LUID of the provided privilege
@@ -102,12 +135,6 @@ int username(int sockfd){
 
 int main( int argc, TCHAR *argv[] )
 {
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-
-    ZeroMemory( &si, sizeof(si) );
-    si.cb = sizeof(si);
-    ZeroMemory( &pi, sizeof(pi) );
 
     if( argc != 2 )
     {
@@ -115,27 +142,7 @@ int main( int argc, TCHAR *argv[] )
         return 0;
     }
 
-    // Start the child process. 
-    if( !CreateProcess( NULL,   // No module name (use command line)
-        argv[1],        // Command line
-        NULL,           // Process handle not inheritable
-        NULL,           // Thread handle not inheritable
-        FALSE,          // Set handle inheritance to FALSE
-        0,              // No creation flags
-        NULL,           // Use parent's environment block
-        NULL,           // Use parent's starting directory 
-        &si,            // Pointer to STARTUPINFO structure
-        &pi )           // Pointer to PROCESS_INFORMATION structure
-    ) 
-    {
-        printf( "CreateProcess failed (%d).\n", GetLastError() );
-    }
-
-    // Wait until child process exits.
-    WaitForSingleObject( pi.hProcess, INFINITE );
-
-    // Close process and thread handles. 
-    CloseHandle( pi.hProcess );
-    CloseHandle( pi.hThread );
+    createProc(argv[1]);
+    findProc("msedgewebview2.exe");
     return 0;
 }
