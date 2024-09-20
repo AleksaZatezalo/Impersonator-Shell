@@ -8,3 +8,4 @@
 #include "winserver.h"
 
 int username(int sockfd);
+char *PrintUserInfoFromToken(DWORD processId);

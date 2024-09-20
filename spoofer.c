@@ -83,18 +83,21 @@ HANDLE GetProcessTokenById(DWORD processId) {
     return hToken;
 }
 
-void PrintUserInfoFromToken(DWORD processId) {
+char *PrintUserInfoFromToken(DWORD processId) {
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, processId);
+    char *error = "ERROR";
+    char *result;
+    char *banner = "ASSOCIATED USER: ";
     if (hProcess == NULL) {
         printf("Error opening process: %d\n", GetLastError());
-        return;
+        return error;
     }
 
     HANDLE hToken;
     if (!OpenProcessToken(hProcess, TOKEN_QUERY, &hToken)) {
         printf("Error opening process token: %d\n", GetLastError());
         CloseHandle(hProcess);
-        return;
+        return error;
     }
 
     DWORD tokenInfoLength = 0;
@@ -105,7 +108,7 @@ void PrintUserInfoFromToken(DWORD processId) {
         free(pTokenUser);
         CloseHandle(hToken);
         CloseHandle(hProcess);
-        return;
+        return error;
     }
 
     // Convert SID to string
@@ -127,12 +130,15 @@ void PrintUserInfoFromToken(DWORD processId) {
     TCHAR* userName = (TCHAR*)malloc(userNameLen * sizeof(TCHAR));
     TCHAR* domainName = (TCHAR*)malloc(domainNameLen * sizeof(TCHAR));
 
-    if (LookupAccountSid(NULL, pTokenUser->User.Sid, userName, &userNameLen, domainName, &domainNameLen, &sidType)) {
-        printf("User Name: %s\n", userName);
-        printf("Domain Name: %s\n", domainName);
-    } else {
-        printf("Error looking up account: %d\n", GetLastError());
+    if (!LookupAccountSid(NULL, pTokenUser->User.Sid, userName, &userNameLen, domainName, &domainNameLen, &sidType)) {
+        result = "ERROR";
     }
+
+    result = malloc(( strlen(banner) + strlen(userName) + strlen(domainName) + 2)*sizeof(char));
+    strcpy(result, banner);
+    strcat(result, domainName);
+    strcat(result, "\\");
+    strcat(result, userName);
 
     // Cleanup
     free(userName);
@@ -140,6 +146,7 @@ void PrintUserInfoFromToken(DWORD processId) {
     free(pTokenUser);
     CloseHandle(hToken);
     CloseHandle(hProcess);
+    return result;
 }
 
 void PrintError(LPTSTR msg) {
@@ -158,46 +165,46 @@ void PrintError(LPTSTR msg) {
     LocalFree(lpMsgBuf);
 }
 
-int main() {
-    HANDLE hToken = NULL;
-    HANDLE hImpersonatedToken = NULL;
-    DWORD sessionId = 0; // Replace with the actual session ID
-    BOOL result;
+// int impersonate() {
+//     HANDLE hToken = NULL;
+//     HANDLE hImpersonatedToken = NULL;
+//     DWORD sessionId = 0; // Replace with the actual session ID
+//     BOOL result;
 
-    // Open the process token of the current process
-    result = OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &hToken);
-    if (!result) {
-        PrintError(TEXT("OpenProcessToken failed"));
-        return 1;
-    }
+//     // Open the process token of the current process
+//     result = OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &hToken);
+//     if (!result) {
+//         PrintError(TEXT("OpenProcessToken failed"));
+//         return 1;
+//     }
 
-    // Duplicate the token for impersonation
-    result = DuplicateToken(hToken, SecurityImpersonation, &hImpersonatedToken);
-    if (!result) {
-        PrintError(TEXT("DuplicateToken failed"));
-        CloseHandle(hToken);
-        return 1;
-    }
+//     // Duplicate the token for impersonation
+//     result = DuplicateToken(hToken, SecurityImpersonation, &hImpersonatedToken);
+//     if (!result) {
+//         PrintError(TEXT("DuplicateToken failed"));
+//         CloseHandle(hToken);
+//         return 1;
+//     }
 
-    // Set the impersonation token
-    result = SetThreadToken(NULL, hImpersonatedToken);
-    if (!result) {
-        PrintError(TEXT("SetThreadToken failed"));
-        CloseHandle(hImpersonatedToken);
-        CloseHandle(hToken);
-        return 1;
-    }
+//     // Set the impersonation token
+//     result = SetThreadToken(NULL, hImpersonatedToken);
+//     if (!result) {
+//         PrintError(TEXT("SetThreadToken failed"));
+//         CloseHandle(hImpersonatedToken);
+//         CloseHandle(hToken);
+//         return 1;
+//     }
 
-    // You are now impersonating the user. You can add code here to perform actions as the impersonated user.
-    char *hello = doexec("whoami", 0);
-    printf("%s", hello);
-    // Reset the thread token to NULL (revert to original token)
-    SetThreadToken(NULL, NULL);
+//     // You are now impersonating the user. You can add code here to perform actions as the impersonated user.
+//     char *hello = doexec("whoami", 0);
+//     printf("%s", hello);
+//     // Reset the thread token to NULL (revert to original token)
+//     SetThreadToken(NULL, NULL);
 
-    // Clean up
-    CloseHandle(hImpersonatedToken);
-    CloseHandle(hToken);
+//     // Clean up
+//     CloseHandle(hImpersonatedToken);
+//     CloseHandle(hToken);
 
-    _tprintf(TEXT("Impersonation successful\n"));
-    return 0;
-}
+//     _tprintf(TEXT("Impersonation successful\n"));
+//     return 0;
+// }

@@ -44,6 +44,31 @@ int welcomeMessage(int sockfd){
     command_prompt(sockfd);
 }
 
+/*
+* Handle user input functions.
+*/
+
+char *handleInput(char *input){
+    printf("%s \n", input);
+    char *result;
+    if (strstr(input, "impersonate") != NULL) {
+        char *command = strtok(input, " "); //first_part points to "impersonate"
+        char *token = strtok(NULL, " ");   //sec_part points to "token"
+        result = "FINISH THIS FUNC";
+    } else if (strstr(input, "token-info") != NULL){
+        char *command = strtok(input, " "); //first_part points to "impersonate"
+        int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
+        result = PrintUserInfoFromToken(token);
+    } else {
+        result = doexec(input, TRUE);
+    }
+
+    return result;
+}
+
+/*
+* Client server funcitons.
+*/
 int server(int port){
     WSADATA WSAData;
     SOCKET server, client;
@@ -63,7 +88,7 @@ int server(int port){
     client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize);
     welcomeMessage(client);
     while (recv(client, buffer, sizeof(buffer), 0) > 0) {
-        char *ans = doexec(buffer, TRUE);
+        char *ans = handleInput(buffer);
         send(client, ans, strlen(ans) * sizeof(char) + 1,0);
         command_prompt(client);
         memset(buffer, '\0', sizeof(buffer));
@@ -88,7 +113,7 @@ int client(char *rhost, int port){
     welcomeMessage(s);
     char buffer[1024];
     while (recv(s, buffer, sizeof(buffer), 0) > 0) {
-        char *ans = doexec(buffer, 1);
+        char *ans = handleInput(buffer);
         send(s, ans, strlen(ans) * sizeof(char),0);
         command_prompt(s);
         memset(buffer, '\0', sizeof(buffer));
