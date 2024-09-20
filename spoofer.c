@@ -31,58 +31,6 @@ int username(int sockfd){
     return 0;
 }
 
-int createProc(char *proc){
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-
-    ZeroMemory( &si, sizeof(si) );
-    si.cb = sizeof(si);
-    ZeroMemory( &pi, sizeof(pi) );
-
-    // Start the child process. 
-    if( !CreateProcess( NULL,   // No module name (use command line)
-        proc,        // Command line
-        NULL,           // Process handle not inheritable
-        NULL,           // Thread handle not inheritable
-        FALSE,          // Set handle inheritance to FALSE
-        0,              // No creation flags
-        NULL,           // Use parent's environment block
-        NULL,           // Use parent's starting directory 
-        &si,            // Pointer to STARTUPINFO structure
-        &pi )           // Pointer to PROCESS_INFORMATION structure
-    ) 
-    {
-        printf( "CreateProcess failed (%d).\n", GetLastError() );
-    }
-
-    // Wait until child process exits.
-    WaitForSingleObject( pi.hProcess, INFINITE );
-
-    // Close process and thread handles. 
-    CloseHandle( pi.hProcess );
-    CloseHandle( pi.hThread );
-    return 0;
-}
-
-HANDLE GetProcessTokenById(DWORD processId) {
-    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, processId);
-    if (hProcess == NULL) {
-        printf("Error opening process: %d\n", GetLastError());
-        return NULL;
-    }
-
-    HANDLE hToken;
-    if (!OpenProcessToken(hProcess, TOKEN_QUERY, &hToken)) {
-        printf("Error opening process token: %d\n", GetLastError());
-        CloseHandle(hProcess);
-        return NULL;
-    }
-
-    // Clean up the process handle, the token handle can be returned
-    CloseHandle(hProcess);
-    return hToken;
-}
-
 char *PrintUserInfoFromToken(DWORD processId) {
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, processId);
     char *error = "ERROR";
@@ -165,46 +113,46 @@ void PrintError(LPTSTR msg) {
     LocalFree(lpMsgBuf);
 }
 
-// int impersonate() {
-//     HANDLE hToken = NULL;
-//     HANDLE hImpersonatedToken = NULL;
-//     DWORD sessionId = 0; // Replace with the actual session ID
-//     BOOL result;
+char *impersonate() {
+    HANDLE hToken = NULL;
+    HANDLE hImpersonatedToken = NULL;
+    DWORD sessionId = 0; // Replace with the actual session ID
+    char *error = "ERROR";
+    char *result;
+    
+    // Open the process token of the current process
+    result = OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &hToken);
+    if (!result) {
+        PrintError(TEXT("OpenProcessToken failed"));
+        return error;
+    }
 
-//     // Open the process token of the current process
-//     result = OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &hToken);
-//     if (!result) {
-//         PrintError(TEXT("OpenProcessToken failed"));
-//         return 1;
-//     }
+    // Duplicate the token for impersonation
+    result = DuplicateToken(hToken, SecurityImpersonation, &hImpersonatedToken);
+    if (!result) {
+        PrintError(TEXT("DuplicateToken failed"));
+        CloseHandle(hToken);
+        return error;
+    }
 
-//     // Duplicate the token for impersonation
-//     result = DuplicateToken(hToken, SecurityImpersonation, &hImpersonatedToken);
-//     if (!result) {
-//         PrintError(TEXT("DuplicateToken failed"));
-//         CloseHandle(hToken);
-//         return 1;
-//     }
+    // Set the impersonation token
+    result = SetThreadToken(NULL, hImpersonatedToken);
+    if (!result) {
+        PrintError(TEXT("SetThreadToken failed"));
+        CloseHandle(hImpersonatedToken);
+        CloseHandle(hToken);
+        return error;
+    }
 
-//     // Set the impersonation token
-//     result = SetThreadToken(NULL, hImpersonatedToken);
-//     if (!result) {
-//         PrintError(TEXT("SetThreadToken failed"));
-//         CloseHandle(hImpersonatedToken);
-//         CloseHandle(hToken);
-//         return 1;
-//     }
+    // You are now impersonating the user. You can add code here to perform actions as the impersonated user.
+    char *command = doexec("whoami", 0);
+    // Reset the thread token to NULL (revert to original token)
+    SetThreadToken(NULL, NULL);
 
-//     // You are now impersonating the user. You can add code here to perform actions as the impersonated user.
-//     char *hello = doexec("whoami", 0);
-//     printf("%s", hello);
-//     // Reset the thread token to NULL (revert to original token)
-//     SetThreadToken(NULL, NULL);
+    // Clean up
+    CloseHandle(hImpersonatedToken);
+    CloseHandle(hToken);
 
-//     // Clean up
-//     CloseHandle(hImpersonatedToken);
-//     CloseHandle(hToken);
-
-//     _tprintf(TEXT("Impersonation successful\n"));
-//     return 0;
-// }
+    _tprintf(TEXT("Impersonation successful\n"));
+    return command;
+}
