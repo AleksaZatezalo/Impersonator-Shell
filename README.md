@@ -38,6 +38,6 @@ If you have benefited from this project and use Monero please consider donanting
 
 [Bypassing Defender on modern Windows 10 systems](https://www.purpl3f0xsecur1ty.tech/2021/03/30/av_evasion.html)
 
-[bypassing windows defender | Malware development](https://www.youtube.com/watch?v=sb_sqvDAvEw)
+[Bypassing windows defender | Malware development](https://www.youtube.com/watch?v=sb_sqvDAvEw)
 
 [Evading EDR The Definitive Guide to Defeating Endpoint Detection Systems](https://www.amazon.ca/Evading-EDR-Definitive-Defeating-Detection/dp/1718503342)
