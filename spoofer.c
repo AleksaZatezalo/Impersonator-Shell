@@ -62,12 +62,9 @@ char *PrintUserInfoFromToken(DWORD processId) {
     // Convert SID to string
     LPTSTR sidString;
     if (ConvertSidToStringSid(pTokenUser->User.Sid, &sidString)) {
-        printf("User SID: %s\n", sidString);
         LocalFree(sidString);
-    } else {
-        printf("Error converting SID to string: %d\n", GetLastError());
     }
-
+    
     // Get user name and domain
     DWORD userNameLen = 0;
     DWORD domainNameLen = 0;
@@ -79,7 +76,7 @@ char *PrintUserInfoFromToken(DWORD processId) {
     TCHAR* domainName = (TCHAR*)malloc(domainNameLen * sizeof(TCHAR));
 
     if (!LookupAccountSid(NULL, pTokenUser->User.Sid, userName, &userNameLen, domainName, &domainNameLen, &sidType)) {
-        result = "ERROR";
+        result = "ERROR: Process potentially terminated.";
     }
 
     result = malloc(( strlen(banner) + strlen(userName) + strlen(domainName) + 2)*sizeof(char));
