@@ -4,7 +4,7 @@ The Impersonator Shell aims to be a viable combination of two widely used hacker
 
 ## Impersonator Shell? Why Bother?
 
-Most often users running a server on a Windows host will have the `SEImpersonatePriveledge` enabled by default. This means that security engineers who can obtain RCE on a windows server, can also obtain an administrative shell by abusing the server's`SEImpersonatePriveledge` by relying on known exploits. Instead of uploading Netcat and an exploit that abuse the `SEImpersonatePriveledge` security engineers can simply use the Impersonator shell. In the event that the `SEImpersonatePriveledge` is disabled or the inbuilt exploit does not work, security engineers will get a non-administrative shell. The Impersonator shell can connect to a metasploit listener and be upgraded to a meterpreter shell.
+Most often users running a server on a Windows host will have the `SEImpersonatePriveledge` enabled by default. This means that security engineers who can obtain RCE on a windows server, can also obtain an administrative shell by abusing the server's`SEImpersonatePriveledge` by relying on known exploits. Instead of uploading Netcat and an exploit that abuse the `SEImpersonatePriveledge` security engineers can simply use the Impersonator shell. The Impersonator Shell uses native Windows API functions to grab a proccess token and impersonate the user running said proccess.  In the event that the `SEImpersonatePriveledge` is disabled or the inbuilt exploit does not work, security engineers will get a non-administrative shell. The Impersonator shell can connect to a metasploit listener and be upgraded to a meterpreter shell.
 
 ## Contribution Guidelines
 
@@ -38,6 +38,6 @@ If you have benefited from this project and use Monero please consider donanting
 
 [Bypassing Defender on modern Windows 10 systems](https://www.purpl3f0xsecur1ty.tech/2021/03/30/av_evasion.html)
 
-[Printspoofer](https://github.com/itm4n/PrintSpoofer)
+[bypassing windows defender | Malware development](https://www.youtube.com/watch?v=sb_sqvDAvEw)
 
 [Evading EDR The Definitive Guide to Defeating Endpoint Detection Systems](https://www.amazon.ca/Evading-EDR-Definitive-Defeating-Detection/dp/1718503342)

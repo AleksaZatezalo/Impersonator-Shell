@@ -9,4 +9,3 @@
 
 int username(int sockfd);
 char *PrintUserInfoFromToken(DWORD processId);
-char *impersonate();
