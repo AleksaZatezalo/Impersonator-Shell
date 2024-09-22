@@ -64,7 +64,7 @@ char *PrintUserInfoFromToken(DWORD processId) {
     if (ConvertSidToStringSid(pTokenUser->User.Sid, &sidString)) {
         LocalFree(sidString);
     }
-    
+
     // Get user name and domain
     DWORD userNameLen = 0;
     DWORD domainNameLen = 0;
@@ -92,6 +92,34 @@ char *PrintUserInfoFromToken(DWORD processId) {
     CloseHandle(hToken);
     CloseHandle(hProcess);
     return result;
+}
+
+char *impersonate(int pid){
+    HANDLE currentTokenHandle = NULL;
+    HANDLE processHandle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, TRUE, pid);
+    int error= GetLastError();
+
+    char *open_proc;
+    if (error == 0) {
+        open_proc = "[+] OpenProcess() success!\n";
+    } else {
+        open_proc = "[-] OpenProccess() failed!\n";
+        return open_proc;
+    }
+    
+    char *open_token;
+    BOOL getToken = OpenProcessToken(processHandle, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY, &currentTokenHandle);
+    error = GetLastError();
+    if (error == 0){
+        open_token = "[+] OpenProcessToken() success!\n";
+    } else {
+        open_token = "[-] OpenProcessToken() failed!\n";
+    }
+
+    char *suc_proc;
+    strcat(suc_proc, open_proc);
+    strcat(suc_proc, open_token);
+        return suc_proc;
 }
 
 void PrintError(LPTSTR msg) {

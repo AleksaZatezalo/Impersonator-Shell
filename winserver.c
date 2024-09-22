@@ -54,7 +54,7 @@ char *handleInput(char *input){
     if (strstr(input, "impersonate") != NULL) {
         char *command = strtok(input, " "); //first_part points to "impersonate"
         int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
-        result = "FINISH THIS FUNC";
+        result = impersonate(token);
     } else if (strstr(input, "token-info") != NULL){
         char *command = strtok(input, " "); //first_part points to "impersonate"
         int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
