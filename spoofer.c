@@ -119,7 +119,7 @@ char *impersonate(int pid){
     char *suc_proc;
     strcat(suc_proc, open_proc);
     strcat(suc_proc, open_token);
-        return suc_proc;
+    return suc_proc;
 }
 
 void PrintError(LPTSTR msg) {
