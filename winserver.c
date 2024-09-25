@@ -1,5 +1,5 @@
 #include "doexec.h"
-#include "spoofer.h"
+#include "token_info.h"
 
 /*
 * String IO Functions
@@ -52,9 +52,7 @@ char *handleInput(char *input){
     printf("%s \n", input);
     char *result;
     if (strstr(input, "impersonate") != NULL) {
-        char *command = strtok(input, " "); //first_part points to "impersonate"
-        int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
-        result = impersonate(token);
+        result = "To Be Continuted... \r\n";
     } else if (strstr(input, "token-info") != NULL){
         char *command = strtok(input, " "); //first_part points to "impersonate"
         int token = atoi(strtok(NULL, " "));   //sec_part points to "token"

