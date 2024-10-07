@@ -49,9 +49,10 @@ int welcomeMessage(int sockfd){
 */
 
 char *handleInput(char *input){
-    printf("%s \n", input);
     char *result;
-    if (strstr(input, "impersonate") != NULL) {
+    if (strstr(input, "help")){
+        result = "Type `help` for help\r\nType `token-info PID` to get token info for process with process ID PID\r\nType `impersonate-admin` to impersonate SYSTEM\r\n";
+    } else if (strstr(input, "impersonate-admin") != NULL) {
         result = "To Be Continuted... \r\n";
     } else if (strstr(input, "token-info") != NULL){
         char *command = strtok(input, " "); //first_part points to "impersonate"

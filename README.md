@@ -36,8 +36,4 @@ If you have benefited from this project and use Monero please consider donanting
 
 [Understanding and Abusing Process Tokens — Part II](https://securitytimes.medium.com/understanding-and-abusing-access-tokens-part-ii-b9069f432962)
 
-[Bypassing Defender on modern Windows 10 systems](https://www.purpl3f0xsecur1ty.tech/2021/03/30/av_evasion.html)
-
-[Bypassing windows defender | Malware development](https://www.youtube.com/watch?v=sb_sqvDAvEw)
-
-[Evading EDR The Definitive Guide to Defeating Endpoint Detection Systems](https://www.amazon.ca/Evading-EDR-Definitive-Defeating-Detection/dp/1718503342)
+[Bypassing Defender on modern Windows 10 systems](https://itm4n.github.io/printspoofer-abusing-impersonate-privileges/)

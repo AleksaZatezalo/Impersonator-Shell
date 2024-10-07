@@ -9,6 +9,8 @@
         "string.h": "c",
         "charconv": "c",
         "userenv.h": "c",
-        "tlhelp32.h": "c"
+        "tlhelp32.h": "c",
+        "xlocale": "c",
+        "token_info.h": "c"
     }
 }
