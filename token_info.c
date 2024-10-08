@@ -1,7 +1,7 @@
 /*
 * Author: Aleksa Zatezalo
-* Date: September 2023
-* Description: Uses the SEImpersonate Priveledge to act as an administrator. 
+* Date: September 2024
+* Description: Returns basic token info.
 */
 
 #include "token_info.h"

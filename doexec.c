@@ -1,6 +1,6 @@
 /*
 * Author: Aleksa Zatezalo
-* Date: September 2023
+* Date: September 2024
 * Description: Doexec is a C program that executes provided commands in terminal and returns output. 
 */
 
