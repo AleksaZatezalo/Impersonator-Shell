@@ -185,3 +185,45 @@ void PrintError(LPTSTR msg) {
     _tprintf(TEXT("%s: %d - %s\n"), msg, errCode, (char*)lpMsgBuf);
     LocalFree(lpMsgBuf);
 }
+
+char *EnablePrivileges(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege) {
+
+	// HANDLE hToken // Handle where the stolen access token will be stored
+	// LPCTSTR PrivName // Privilege name to enable/disable 
+	// BOOL EnablePrivilege // Enable/Disable privilege
+
+	TOKEN_PRIVILEGES tp;
+	LUID luid; // A pointer to recieve LUID of the privilege on local system
+
+    char *result;
+	if (!LookupPrivilegeValue(NULL, lpszPrivilege, &luid))
+	{
+        char *val = "[-] LookupPrivilegeValue() Failed\r\n";
+        result = malloc(sizeof(val));
+		strcpy(result, val);
+        return result;
+	}
+
+	tp.PrivilegeCount = 1;
+	tp.Privileges[0].Luid = luid;
+	if (bEnablePrivilege)
+	{
+		tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+	}
+	else {
+		tp.Privileges[0].Attributes = 0;
+	}
+
+	if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES)NULL, (PDWORD)NULL))
+	{
+        char *val = "AdjustTokenPrivileges() Failed\r\n";
+        result = malloc(sizeof(val));
+		strcpy(result, val);
+        return result;
+	}
+    
+    char *val = "[+] Privilege enabled!\r\n";
+    result = malloc(sizeof(val));
+	strcpy(result, val);
+    return result;
+}

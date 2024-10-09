@@ -10,3 +10,4 @@
 int username(int sockfd);
 char *PrintUserInfoFromToken(DWORD processId);
 char *impersonate(DWORD proccessId, char* command);
+char *EnablePrivileges(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege);

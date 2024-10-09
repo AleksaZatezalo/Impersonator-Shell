@@ -51,9 +51,14 @@ int welcomeMessage(int sockfd){
 char *handleInput(char *input){
     char *result;
     if (strstr(input, "help")){
-        result = "Type `help` for help\r\nType `token-info PID` to get token info for process with process ID PID\r\nType `impersonate-admin` to impersonate SYSTEM\r\n";
-    } else if (strstr(input, "impersonate-admin") != NULL) {
+        result = "Type `help` for help\r\nType `token-info PID` to get token info for process with process ID PID\r\nType `impersonate PID` to impersonate a PID's associated user\r\nType `enable-debug` to enable the debug priv\r\n";
+    } else if (strstr(input, "impersonate") != NULL) {
         result = "To Be Continuted... \r\n";
+    } else if (strstr(input, "enable-debug") != NULL) {
+        HANDLE CurrentTokenHandle = NULL;
+        BOOL getCurrentToken = OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &CurrentTokenHandle);
+        // Finally enable the SE_DEBUG_PRIVILEGE
+        result = EnablePrivileges(CurrentTokenHandle, SE_DEBUG_NAME, TRUE);
     } else if (strstr(input, "token-info") != NULL){
         char *command = strtok(input, " "); //first_part points to "impersonate"
         int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
