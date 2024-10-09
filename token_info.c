@@ -199,7 +199,7 @@ char *EnablePrivileges(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivile
 	if (!LookupPrivilegeValue(NULL, lpszPrivilege, &luid))
 	{
         char *val = "[-] LookupPrivilegeValue() Failed\r\n";
-        result = malloc(sizeof(val));
+        result = malloc(strlen(val) * sizeof(char) + 2);
 		strcpy(result, val);
         return result;
 	}
@@ -217,13 +217,13 @@ char *EnablePrivileges(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivile
 	if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES)NULL, (PDWORD)NULL))
 	{
         char *val = "AdjustTokenPrivileges() Failed\r\n";
-        result = malloc(sizeof(val));
+        result = malloc(strlen(val) * sizeof(char) + 2);
 		strcpy(result, val);
         return result;
 	}
     
     char *val = "[+] Privilege enabled!\r\n";
-    result = malloc(sizeof(val));
+    result = malloc(strlen(val) * sizeof(char) + 2);
 	strcpy(result, val);
     return result;
 }
