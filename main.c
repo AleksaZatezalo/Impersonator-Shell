@@ -1,7 +1,7 @@
 /*
 * Author: Aleksa Zatezalo
-* Date: September 2023
-* Description: The impersonator shell that combines winserver.c, doexec.c, and spoofer.c into a shell. 
+* Date: September 2024
+* Description: The impersonator shell that combines winserver.c, doexec.c, and token_info.c into a shell. 
 */
 
 #include "doexec.h"

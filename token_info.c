@@ -1,7 +1,7 @@
 /*
 * Author: Aleksa Zatezalo
 * Date: September 2024
-* Description: Returns basic token info.
+* Description: Returns basic token info and allows for impersonation.
 */
 
 #include "token_info.h"

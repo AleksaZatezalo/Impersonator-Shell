@@ -1,3 +1,9 @@
+/*
+* Author: Aleksa Zatezalo
+* Date: September 2024
+* Description: Functionality that acts as reverse-shell or bind-shell software.
+*/
+
 #include "doexec.h"
 #include "token_info.h"
 
