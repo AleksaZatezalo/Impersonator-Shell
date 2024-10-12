@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <tlhelp32.h>
 
+// Compile with gcc open_notepad.c -o open_notepad -ladvapi32
+
 BOOL SetPrivilege(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege) {
     TOKEN_PRIVILEGES tp;
     LUID luid;
@@ -118,6 +120,16 @@ BOOL EnableImpersonatePrivilege() {
     return TRUE;
 }
 
+void name(){
+    char username[256]; 
+    DWORD username_len = sizeof(username);  // Length of the buffer
+    // Get the username of the current user
+    if (GetUserNameA(username, &username_len)) {
+       printf("[+] Current user: %s\n", username);
+    } else {
+        printf("Failed to get username: %lu\n", GetLastError());
+    }
+}
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
@@ -132,6 +144,9 @@ int main(int argc, char *argv[]) {
     if(!EnableImpersonatePrivilege){
         return 1;
     }
+
+    name();
+
     DWORD pid = atoi(argv[1]);
     HANDLE hToken = OpenProcessWithToken(pid);
     if (hToken) {
@@ -144,21 +159,23 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
+        name();
         // Spawn Notepad
-        STARTUPINFO si;
-        PROCESS_INFORMATION pi;
+       // STARTUPINFO si;
+       // PROCESS_INFORMATION pi;
 
-        ZeroMemory(&si, sizeof(si));
-        si.cb = sizeof(si);
-        ZeroMemory(&pi, sizeof(pi));
+        //ZeroMemory(&si, sizeof(si));
+        //si.cb = sizeof(si);
+       // ZeroMemory(&pi, sizeof(pi));
 
-        if (!CreateProcess("C:\\Windows\\System32\\notepad.exe", NULL, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
-            printf("[-] CreateProcess error: %u\n", GetLastError());
-        } else {
-            printf("[+] Notepad spawned!\n");
-            CloseHandle(pi.hProcess);
-            CloseHandle(pi.hThread);
-        }
+
+       // if (!CreateProcess("C:\\Windows\\System32\\notepad.exe", NULL, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+         //   printf("[-] CreateProcess error: %u\n", GetLastError());
+       // } else {
+         //   printf("[+] Notepad spawned!\n");
+           // CloseHandle(pi.hProcess);
+           // CloseHandle(pi.hThread);
+       // }
 
         // Revert to self
         RevertToSelf();
