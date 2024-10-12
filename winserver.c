@@ -57,7 +57,11 @@ int welcomeMessage(int sockfd){
 char *handleInput(char *input){
     char *result;
     if (strstr(input, "help")){
-        result = "Type `help` for help\r\nType `token-info PID` to get token info for process with process ID PID\r\nType `impersonate PID` to impersonate a PID's associated user\r\n";
+        result = "Type `help` for help\r\nType `spawn-proc process` to spawn process.\r\nType `enable-priv privilege` to spawn process.\r\nType `token-info PID` to get token info for process with process ID PID\r\nType `impersonate PID` to impersonate a PID's associated user\r\n";
+    } else if (strstr(input, "spawn-proc") != NULL) {
+        result = "To Be Continuted... \r\n";
+    } else if (strstr(input, "enable-priv") != NULL) {
+        result = "To Be Continuted... \r\n";
     } else if (strstr(input, "impersonate") != NULL) {
         result = "To Be Continuted... \r\n";
     } else if (strstr(input, "token-info") != NULL){
