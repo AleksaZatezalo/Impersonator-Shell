@@ -7,8 +7,7 @@
 #include "doexec.h"
 #include "winserver.h"
 
-int username(int sockfd);
 char *PrintUserInfoFromToken(DWORD processId);
 char *EnablePrivileges(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege);
-char *impersonate(int pid);
+char *Impersonate(int pid);
 char *EnableDebugPrivilege();

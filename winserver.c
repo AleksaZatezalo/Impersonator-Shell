@@ -46,7 +46,6 @@ int command_prompt(int sockfd){
 
 int welcomeMessage(int sockfd){
     header(sockfd);
-    username(sockfd);
     command_prompt(sockfd);
 }
 
@@ -63,7 +62,7 @@ char *handleInput(char *input){
     } else if (strstr(input, "impersonate") != NULL) {
         char *command = strtok(input, " "); //first_part points to "impersonate"
         int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
-        result = impersonate(token);
+        result = Impersonate(token);
     } else if (strstr(input, "token-info") != NULL){
         char *command = strtok(input, " "); //first_part points to "token-info"
         int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
