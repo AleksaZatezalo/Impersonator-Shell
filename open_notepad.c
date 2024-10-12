@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <tlhelp32.h>
+#include "doexec.h"
 
 // Compile with gcc open_notepad.c -o open_notepad -ladvapi32
 
