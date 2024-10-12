@@ -90,10 +90,10 @@ BOOL HasTokenPermission(HANDLE hToken, DWORD desiredAccess) {
 }
 
 char *PrintUserInfoFromToken(DWORD processId) {
-    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, processId);
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId);
     char *error = "ERROR";
     char *result;
-    char *banner = "[+] Associated user: ";
+    char *banner = "[!] Associated user: ";
     if (hProcess == NULL) {
         printf("Error opening process: %d\n", GetLastError());
         return error;
@@ -117,19 +117,19 @@ char *PrintUserInfoFromToken(DWORD processId) {
         return error;
     }
 
-    // char* privilegesString = GetTokenPrivilegesAsString(hToken);
-    // char* has_query = "\r\n[-] Token does not have query perms.";
-    // char* has_duplicate = "\r\n[-] Token does not have duplicate perms.";
-    // char* has_impersonate  = "\r\n[-] Token does not have impersonate perms.\r\n";
-    // if (HasTokenPermission(hToken, TOKEN_QUERY)){
-    //     has_query = "\r\n[+] Token has query perms.";
-    // }
-    // if (HasTokenPermission(hToken, TOKEN_DUPLICATE)){
-    //     has_duplicate = "\r\n[+] Token has duplicate perms.";
-    // }
-    // if (HasTokenPermission(hToken, TOKEN_IMPERSONATE)){
-    //     has_impersonate  = "\r\n[+] Token has have impersonate perms.\r\n";
-    // }
+    char* privilegesString = GetTokenPrivilegesAsString(hToken);
+    char* debug_required = "\r\n[!] The Debug privilege may be required.";
+    char* has_duplicate = "\r\n     [-] Token does not have duplicate perms.";
+    char* has_impersonate  = "\r\n     [-] Token does not have impersonate perms. \r\n";
+    if (HasTokenPermission(hToken, TOKEN_DUPLICATE)){
+        has_duplicate = "\r\n     [+] Token has duplicate perms.";
+    }
+    if (HasTokenPermission(hToken, TOKEN_IMPERSONATE)){
+        has_impersonate  = "\r\n     [+] Token has have impersonate perms.";
+    }
+    if (HasTokenPermission(hToken, TOKEN_IMPERSONATE) & HasTokenPermission(hToken, TOKEN_DUPLICATE)){
+        debug_required = "\r\n[+] The Debug privilege may not be required.";
+    }
 
 
     // Convert SID to string
@@ -152,21 +152,14 @@ char *PrintUserInfoFromToken(DWORD processId) {
         result = "ERROR: Process potentially terminated.";
     }
 
-    // result = malloc(( strlen(banner) + strlen(userName) + strlen(domainName) + strlen(has_query) + strlen(has_duplicate) + strlen(has_impersonate) + 2)*sizeof(char));
-    // strcpy(result, banner);
-    // strcat(result, domainName);
-    // strcat(result, "\\");
-    // strcat(result, userName);
-    // strcat(result, has_query);
-    // strcat(result, has_duplicate);
-    // strcat(result, has_impersonate);
-
-    result = malloc(( strlen(banner) + strlen(userName) + strlen(domainName) + 2)*sizeof(char));
+    result = malloc(( strlen(banner) + strlen(userName) + strlen(domainName) + strlen(has_duplicate) + strlen(has_impersonate) + strlen(debug_required) + 2)*sizeof(char));
     strcpy(result, banner);
     strcat(result, domainName);
     strcat(result, "\\");
     strcat(result, userName);
-    strcat(result, "\r\n");
+    strcat(result, debug_required);
+    strcat(result, has_duplicate);
+    strcat(result, has_impersonate);
 
     // Cleanup
     free(userName);
@@ -266,9 +259,9 @@ char *EnableDebugPrivilege() {
     }
     CloseHandle(hToken);
     
-    char *goodProc = "[+] Process opened\r\n";
-    char *goodLookup = "[+] Privilege list recived\r\n";
-    char *goodAdjust = "[+] Debug privilege added\r\n";
+    char *goodProc = "[+] Local process token opened.\r\n";
+    char *goodLookup = "[+] Privilege list recived.\r\n";
+    char *goodAdjust = "[+] Debug privilege enable.\r\n";
     int len = strlen(goodProc) + strlen(goodLookup) + strlen(goodAdjust);
     int size = len * sizeof(char);
     result = malloc(size + 1);
