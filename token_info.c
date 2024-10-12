@@ -234,3 +234,46 @@ char *EnablePrivileges(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivile
 	strcpy(result, val);
     return result;
 }
+
+char *EnableDebugPrivilege() {
+    HANDLE hToken;
+    char *result;
+    char *failedProc = "[-] OpenProcessToken error\r\n";
+    char *lookupError = "[-] LookupPrivilegeValue error\r\n";
+    char *adjustError = "[-] AdjustTokenPrivileges error\r\n";
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
+        result = malloc(sizeof(failedProc) + 1);
+        strcpy(result, failedProc);
+        return result;
+    }
+
+    LUID luid;
+    if (!LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &luid)) {
+        result = malloc(sizeof(lookupError) + 1);
+        strcpy(result, lookupError);
+        return result;
+    }
+
+    TOKEN_PRIVILEGES tp;
+    tp.PrivilegeCount = 1;
+    tp.Privileges[0].Luid = luid;
+    tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+    if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), NULL, NULL)) {
+        result = malloc(sizeof(adjustError) + 1);
+        strcpy(result, adjustError);
+        return result;
+    }
+    CloseHandle(hToken);
+    
+    char *goodProc = "[+] Process opened\r\n";
+    char *goodLookup = "[+] Privilege list recived\r\n";
+    char *goodAdjust = "[+] Debug privilege added\r\n";
+    int len = strlen(goodProc) + strlen(goodLookup) + strlen(goodAdjust);
+    int size = len * sizeof(char);
+    result = malloc(size + 1);
+    strcpy(result, goodProc);
+    strcat(result, goodLookup);
+    strcat(result, goodAdjust);
+    return result;
+}

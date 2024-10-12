@@ -58,8 +58,8 @@ char *handleInput(char *input){
     char *result;
     if (strstr(input, "help")){
         result = "Type `help` for help\r\nType `token-info PID` to get token info for process with process ID PID\r\nType `enable-debug` to enable the debug privilege.\r\nType `impersonate PID` to impersonate a PID's associated user\r\n";
-    } else if (strstr(input, "enable-priv") != NULL) {
-        result = "To Be Continuted... \r\n";
+    } else if (strstr(input, "enable-debug") != NULL) {
+        result = EnableDebugPrivilege();
     } else if (strstr(input, "impersonate") != NULL) {
         result = "To Be Continuted... \r\n";
     } else if (strstr(input, "token-info") != NULL){
