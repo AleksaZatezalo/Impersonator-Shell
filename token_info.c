@@ -247,8 +247,8 @@ char *EnableDebugPrivilege() {
     CloseHandle(hToken);
     
     char *goodProc = "[+] Local process token opened.\r\n";
-    char *goodLookup = "[+] Privilege list recived.\r\n";
-    char *goodAdjust = "[+] Debug privilege enable.\r\n";
+    char *goodLookup = "[+] Privilege list received.\r\n";
+    char *goodAdjust = "[+] Debug privilege enabled.\r\n";
     int len = strlen(goodProc) + strlen(goodLookup) + strlen(goodAdjust);
     int size = len * sizeof(char);
     result = malloc(size + 1);
