@@ -311,39 +311,6 @@ char *name(){
     return result;
 }
 
-
-HANDLE OpenProcessWithToken(DWORD pid) {
-    // Open the target process with necessary access rights
-    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_DUP_HANDLE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
-    if (hProcess == NULL) {
-        printf("[-] OpenProcess error: %u\n", GetLastError());
-        return NULL;
-    }
-
-    HANDLE hToken;
-    // Open the process token
-    if (!OpenProcessToken(hProcess, TOKEN_DUPLICATE | TOKEN_QUERY, &hToken)) {
-        printf("[-] OpenProcessToken error: %u\n", GetLastError());
-        CloseHandle(hProcess);
-        return NULL;
-    }
-
-    HANDLE hPrimaryToken;
-    // Duplicate the token to create a primary token
-    if (!DuplicateTokenEx(hToken, TOKEN_ALL_ACCESS, NULL, SecurityImpersonation, TokenPrimary, &hPrimaryToken)) {
-        printf("[-] DuplicateTokenEx error: %u\n", GetLastError());
-        CloseHandle(hToken);
-        CloseHandle(hProcess);
-        return NULL;
-    }
-
-    // Clean up handles
-    CloseHandle(hToken);
-    CloseHandle(hProcess);
-
-    return hPrimaryToken; // Return the primary token
-}
-
 HANDLE getPrimaryTokenFromProcess(DWORD processId) {
     // Open the target process with necessary access rights
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_DUP_HANDLE, FALSE, processId);
