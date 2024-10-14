@@ -7,7 +7,6 @@
 #include "doexec.h"
 #include "winserver.h"
 
-char *PrintUserInfoFromToken(DWORD processId);
-char *EnablePrivileges(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege);
-char *Impersonate(int pid);
-char *EnableDebugPrivilege();
+char *printUserInfoFromToken(DWORD processId);
+char *impersonate(int pid);
+char *enableDebugPrivilege();

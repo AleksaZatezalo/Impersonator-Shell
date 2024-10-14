@@ -6,7 +6,7 @@ void ErrorExit(const char* msg) {
     ExitProcess(1);
 }
 
-char *EnableDebugPrivilege() {
+char *enableDebugPrivilege() {
     HANDLE hToken;
     char *result;
     char *failedProc = "[-] OpenProcessToken error\r\n";
@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     
-    char *enable = EnableDebugPrivilege();
+    char *enable = enableDebugPrivilege();
     printf(enable);
     DWORD pid = (DWORD)atoi(argv[1]);
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_DUP_HANDLE | PROCESS_VM_READ, FALSE, pid);

@@ -6,7 +6,7 @@
 
 #include "doexec.h"
 
-char* doexec(char *command, int user_input)
+char* doExec(char *command, int user_input)
 {
     FILE *pPipe;
     char var[128];
