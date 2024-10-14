@@ -7,7 +7,7 @@
 #include "doexec.h"
 #include "winserver.h"
 
-// gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32
+// Compile with: gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32
 
 int main(int argc, char *argv[]) {
     if(argc < 3){

