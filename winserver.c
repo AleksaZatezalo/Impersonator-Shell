@@ -10,17 +10,6 @@
 /*
 * String IO Functions
 */
-void Help(char *name)
-{
-    printf("Usage:\n");
-    printf("\t-u - use udp instead of tcp\n");
-    printf("\t-l - server mode, ADDRESS can be blank, default ip will be used\n");
-    printf("\t-4 - force ip4\n");
-    printf("\t-6 - force ip6\n\n");
-    printf("\t%s [-u -4 -6] ADDRESS PORT\n", name);
-    printf("\t%s -l [-u -4 -6] [ADDRESS] PORT\n", name);
-    exit(0);
-}
 
 int header(int sockfd){
 
@@ -35,7 +24,7 @@ int header(int sockfd){
     return 0;
 }
 
-int command_prompt(int sockfd){
+int commandPrompt(int sockfd){
 
     /*print Impersonator*/
     char *print_this = "\n[Impersonator Shell]> ";
@@ -46,7 +35,7 @@ int command_prompt(int sockfd){
 
 int welcomeMessage(int sockfd){
     header(sockfd);
-    command_prompt(sockfd);
+    commandPrompt(sockfd);
 }
 
 /*
@@ -98,7 +87,7 @@ int server(int port){
     while (recv(client, buffer, sizeof(buffer), 0) > 0) {
         char *ans = handleInput(buffer);
         send(client, ans, strlen(ans) * sizeof(char) + 1,0);
-        command_prompt(client);
+        commandPrompt(client);
         memset(buffer, '\0', sizeof(buffer));
         free(ans);
     }
@@ -124,7 +113,7 @@ int client(char *rhost, int port){
     while (recv(s, buffer, sizeof(buffer), 0) > 0) {
         char *ans = handleInput(buffer);
         send(s, ans, strlen(ans) * sizeof(char),0);
-        command_prompt(s);
+        commandPrompt(s);
         memset(buffer, '\0', sizeof(buffer));
         free(ans);
     }
