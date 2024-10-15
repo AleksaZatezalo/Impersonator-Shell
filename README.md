@@ -37,5 +37,3 @@ If you have benefited from this project and use Monero please consider donanting
 [Understanding and Abusing Process Tokens — Part I](https://securitytimes.medium.com/understanding-and-abusing-process-tokens-part-i-ee51671f2cfa)
 
 [Understanding and Abusing Process Tokens — Part II](https://securitytimes.medium.com/understanding-and-abusing-access-tokens-part-ii-b9069f432962)
-
-[Bypassing Defender on modern Windows 10 systems](https://itm4n.github.io/printspoofer-abusing-impersonate-privileges/)
