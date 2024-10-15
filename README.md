@@ -32,6 +32,8 @@ If you have benefited from this project and use Monero please consider donanting
 
 [SEImpersonatePriveledge](https://learn.microsoft.com/en-us/answers/questions/1087721/how-to-disable-seimpersonate-privilege-for-a-user)
 
+[Process Impersonator](https://github.com/AleksaZatezalo/ProcessImpersonator)
+
 [Understanding and Abusing Process Tokens — Part I](https://securitytimes.medium.com/understanding-and-abusing-process-tokens-part-i-ee51671f2cfa)
 
 [Understanding and Abusing Process Tokens — Part II](https://securitytimes.medium.com/understanding-and-abusing-access-tokens-part-ii-b9069f432962)
