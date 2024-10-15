@@ -8,5 +8,5 @@
 #include "winserver.h"
 
 char *printUserInfoFromToken(DWORD processId);
-char *impersonate(int pid);
+char *impersonate(int pid, char *command);
 char *enableDebugPrivilege();

