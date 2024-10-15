@@ -7,8 +7,7 @@
 #include "doexec.h"
 #include "winserver.h"
 
-// Compile with: gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32
-
+// Compile with: gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %windir%\system32\advapi32.dll  
 int main(int argc, char *argv[]) {
     if(argc < 3){
         printf("USAGE: .\\impersonator --port 4444 \n");
