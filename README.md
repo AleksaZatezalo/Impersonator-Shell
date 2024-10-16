@@ -1,6 +1,6 @@
 # Impersonator Shell
 
-The Impersonator Shell aims to be a fortified version of netcat that allows security engineers to manipulte tokens and impersonate users. The binary is named after the Windows privilege that many kernal exploits use administrative access, the `SeImpersonatePrivilege`. It can provide security engineers with a administrative shell when running within the context of of a user who has the `SeImpersonatePrivelege` Privelege enabled.
+The Impersonator Shell aims to be a fortified version of netcat that allows security engineers to manipulte tokens and impersonate users. The binary is named after the Windows privilege that many kernal exploits use administrative access, the `SeImpersonatePrivilege`. It can provide security engineers with a administrative shell when running within the context of of a user who has the `SeImpersonatePrivelege` Privilege enabled.
 
 ## Impersonator Shell? Why Bother?
 
