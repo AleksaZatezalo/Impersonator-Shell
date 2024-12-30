@@ -1,10 +1,20 @@
 # Impersonator Shell
 
-The Impersonator Shell aims to be a fortified version of netcat that allows security engineers to manipulate tokens and impersonate users. The binary is named after the Windows privilege that many kernal exploits use administrative access, the `SeImpersonatePrivilege`. It can provide security engineers with a administrative shell when running within the context of of a user who has the `SeImpersonatePrivelege` Privilege enabled.
+The Impersonator Shell was conceived as a combination of commonly used penetration testing tools like netcat and the printspoofer exploit. It later evolved into a utility focused assist security professionals with all things that occur after obtaining initial access on a target machine. The tool interacts with the Windows SeImpersonatePrivilege, which is a security setting designed to allow services to impersonate clients. When analyzing potential exposures, security engineers may examine how services with this privilege enabled could affect the system's security posture.
 
 ## Impersonator Shell? Why Bother?
 
 Most often users running a server on a Windows host will have the `SEImpersonatePriveledge` enabled by default. This means that security engineers who can obtain RCE on a windows server, can also obtain an administrative shell by abusing the server's`SEImpersonatePriveledge` by relying on known exploits. Instead of uploading Netcat and an exploit that abuse the `SEImpersonatePriveledge` security engineers can simply use the Impersonator shell. The Impersonator Shell uses native Windows API functions to grab a proccess token and impersonate the user running said proccess.  In the event that the `SEImpersonatePriveledge` is disabled or the inbuilt exploit does not work, security engineers will get a non-administrative shell. The Impersonator shell can connect to a metasploit listener and be upgraded to a meterpreter shell.
+
+### Next Steps
+
+A few of the following things will be implemented as a part of the Impersonator shell:
+
+* More robust error handeling and messages
+* Removing users ability to alter privs
+* File transfer functionality & downloading
+* LSASS Dumping
+* Adding netexec functionality to the shell
 
 ### Compilation
 
