@@ -11,10 +11,13 @@ Most often users running a server on a Windows host will have the `SEImpersonate
 A few of the following things will be implemented as a part of the Impersonator shell:
 
 * More robust error handeling and messages
+* Create a new folder
 * Removing users ability to alter privs
 * File transfer functionality & downloading
 * LSASS Dumping
 * Adding netexec functionality to the shell
+* Update the help banner
+* Include a Makefile for compilation
 
 ### Compilation
 
