@@ -1,45 +1,86 @@
 # Impersonator Shell
 
-The Impersonator Shell was conceived as a combination of commonly used penetration testing tools like netcat and the printspoofer exploit. It later evolved into a utility focused assist security professionals with all things that occur after obtaining initial access on a target machine. The tool interacts with the Windows SeImpersonatePrivilege, which is a security setting designed to allow services to impersonate clients. When analyzing potential exposures, security engineers may examine how services with this privilege enabled could affect the system's security posture.
+A sophisticated security assessment tool that leverages Windows token manipulation for post-exploitation analysis. This project combines the functionality of traditional penetration testing tools with advanced Windows API integration for seamless privilege escalation capabilities.
 
-## Impersonator Shell? Why Bother?
+## Key Features
 
-Most often users running a server on a Windows host will have the `SEImpersonatePriveledge` enabled by default. This means that security engineers who can obtain RCE on a windows server, can also obtain an administrative shell by abusing the server's`SEImpersonatePriveledge` by relying on known exploits. Instead of uploading Netcat and an exploit that abuse the `SEImpersonatePriveledge` security engineers can simply use the Impersonator shell. The Impersonator Shell uses native Windows API functions to grab a proccess token and impersonate the user running said proccess.  In the event that the `SEImpersonatePriveledge` is disabled or the inbuilt exploit does not work, security engineers will get a non-administrative shell. The Impersonator shell can connect to a metasploit listener and be upgraded to a meterpreter shell.
+- **Native Token Manipulation**: Utilizes Windows API for token operations without requiring external tools
+- **Automatic Privilege Detection**: Identifies and leverages available SeImpersonatePrivilege
+- **Fallback Mechanisms**: Gracefully degrades to non-administrative shell when privileges are unavailable
+- **Metasploit Integration**: Supports session upgrade to Meterpreter shell
+- **Zero External Dependencies**: Operates using only native Windows components
 
-### Next Steps
+## Technical Implementation
 
-A few of the following things will be implemented as a part of the Impersonator shell:
+### Prerequisites
 
-* More robust error handeling and messages
-* Create a new folder
-* Removing users ability to alter privs
-* File transfer functionality & downloading
-* LSASS Dumping
-* Adding netexec functionality to the shell
-* Update the help banner
-* Include a Makefile for compilation
+- Windows development environment
+- GCC compiler
+- Windows SDK (for API headers)
 
 ### Compilation
 
-To compile this project clone the repo. After entering the project directory run the following command:
-
-```
-gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %windir%\system32\advapi32.dll 
+```bash
+gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %windir%\system32\advapi32.dll
 ```
 
-## Contribution Guidelines
+### Core Components
 
-When contributing to this repository, please first discuss the change you wish to make via issue here on GitHub. Make sure all pull requests are tagged with a specific ticket number found in the repositories issues section.Before making any changes please create your own branch. Follow all three points below before opening a PR:
+#### Token Management
 
-1. Any changes you want to create must be tagged to an issue opened on this repo. If an issue you've found does not yet exit, please open it.
-2. Ensure any install or build dependencies are removed before the end of the layer when doing a build.
-3. Make sure all corresponding test cases pass.
-4. Update the README.md with details of changes to the interface, this includes new environment variables, exposed ports, useful file locations and container parameters.
+- Process token acquisition
+- Privilege elevation through SeImpersonatePrivilege
+- Token impersonation and manipulation
 
-Note that we have a code of conduct. Follow it in all your interactions with the project.
+#### Shell Operations
 
-## Known Issues
+- Command execution environment
+- Process spawning and management
+- Session handling
 
+## Roadmap
+
+### Planned Features
+
+- Advanced file transfer system with integrity verification
+- LSASS memory analysis capabilities
+- Comprehensive system enumeration module
+- Build automation through Makefile integration
+- Implementing the following architecture
+
+#### Architecture Overview
+
+The Impersonator Shell is built around three core components:
+
+1. **Token Manipulation Engine**: Interfaces directly with Windows API for process token operations
+2. **Shell Interface**: Provides command execution and session management
+3. **Network Communication Layer**: Handles connections and protocol implementation
+
+### Security Considerations
+
+- Token privilege verification
+- Session isolation
+- Secure communication protocols
+
+
+### Contributing
+1. **Issue Tracking**: All changes must reference an existing issue
+   - Create new issues for undocumented problems
+   - Use detailed descriptions and steps to reproduce
+
+2. **Build Process**
+   - Remove build artifacts before commits
+   - Verify clean compilation
+   - Update documentation for interface changes
+
+3. **Testing**
+   - Add test cases for new functionality
+   - Verify existing test suite passes
+   - Document test coverage
+
+## Acknowledgments
+- [Build Your Own Shell Project](https://github.com/AleksaZatezalo/BYOS)
+- [Process Impersonator](https://github.com/AleksaZatezalo/ProcessImpersonator)
 A list of known issues and features that are currently being addressed are maintained on the github issues tab. Please look at the list of known issues before raising a new issue.
 
 ## Donation Link
