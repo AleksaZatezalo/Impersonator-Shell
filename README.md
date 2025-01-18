@@ -64,6 +64,7 @@ The Impersonator Shell is built around three core components:
 
 
 ### Contributing
+
 1. **Issue Tracking**: All changes must reference an existing issue
    - Create new issues for undocumented problems
    - Use detailed descriptions and steps to reproduce
@@ -77,11 +78,6 @@ The Impersonator Shell is built around three core components:
    - Add test cases for new functionality
    - Verify existing test suite passes
    - Document test coverage
-
-## Acknowledgments
-- [Build Your Own Shell Project](https://github.com/AleksaZatezalo/BYOS)
-- [Process Impersonator](https://github.com/AleksaZatezalo/ProcessImpersonator)
-A list of known issues and features that are currently being addressed are maintained on the github issues tab. Please look at the list of known issues before raising a new issue.
 
 ## Donation Link
 
