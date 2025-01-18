@@ -5,7 +5,7 @@
 */
 
 #include "doexec.h"
-#include "../impersonation/token_info.h"
+#include "token_info.h"
 
 /*
 * String IO Functions
