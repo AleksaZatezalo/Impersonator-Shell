@@ -46,15 +46,6 @@ gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %wi
 - LSASS memory analysis capabilities
 - Comprehensive system enumeration module
 - Build automation through Makefile integration
-- Implementing the following architecture
-
-#### Architecture Overview
-
-The Impersonator Shell is built around three core components:
-
-1. **Token Manipulation Engine**: Interfaces directly with Windows API for process token operations
-2. **Shell Interface**: Provides command execution and session management
-3. **Network Communication Layer**: Handles connections and protocol implementation
 
 ### Security Considerations
 
