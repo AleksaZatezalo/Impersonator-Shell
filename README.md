@@ -35,8 +35,15 @@ gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %wi
 #### Shell Operations
 
 - Command execution environment
-- Process spawning and management
 - Session handling
+
+#### Post Exploitation Operations
+
+- Transfering files between target and attacking machine
+- Downloading files to the target machine
+- Enumerating the target OS
+- Extracting information from the underlying OS
+
 
 ## Roadmap
 
@@ -46,6 +53,7 @@ gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %wi
 - LSASS memory analysis capabilities
 - Comprehensive system enumeration module
 - Build automation through Makefile integration
+- Clean up architecture and code styles
 
 ### Security Considerations
 
