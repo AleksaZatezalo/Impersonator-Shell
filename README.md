@@ -5,10 +5,9 @@ A sophisticated security assessment tool that leverages Windows token manipulati
 ## Key Features
 
 - **Native Token Manipulation**: Utilizes Windows API for token operations without requiring external tools
-- **Automatic Privilege Detection**: Identifies and leverages available SeImpersonatePrivilege
-- **Fallback Mechanisms**: Gracefully degrades to non-administrative shell when privileges are unavailable
-- **Metasploit Integration**: Supports session upgrade to Meterpreter shell
 - **Zero External Dependencies**: Operates using only native Windows components
+- **File Transfer Capabilities**: Seemlessly transfers files between victem and target
+- **Enumeration Capabilities**: The binary has a simplified version of [WinPeas](https://github.com/peass-ng/PEASS-ng/tree/master/winPEAS) build into it.
 
 ## Technical Implementation
 
