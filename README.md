@@ -59,7 +59,6 @@ gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %wi
 - Session isolation
 - Secure communication protocols
 
-
 ### Contributing
 
 1. **Issue Tracking**: All changes must reference an existing issue
