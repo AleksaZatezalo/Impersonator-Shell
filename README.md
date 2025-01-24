@@ -6,19 +6,11 @@ A sophisticated security assessment tool that leverages Windows token manipulati
 
 - **Native Token Manipulation**: Utilizes Windows API for token operations without requiring external tools
 - **Zero External Dependencies**: Operates using only native Windows components
-- **Enumeration Capabilities**: The binary has a simplified version of [WinPeas](https://github.com/peass-ng/PEASS-ng/tree/master/winPEAS) and [Nmap](https://github.com/nmap/nmap) build into it.
-
-## Technical Implementation
-
-### Prerequisites
-
-- Windows development environment
-- GCC compiler
-- Windows SDK (for API headers)
+- **Enumeration Capabilities (PENDING)**: The binary has a simplified version of [WinPeas](https://github.com/peass-ng/PEASS-ng/tree/master/winPEAS) and [Nmap](https://github.com/nmap/nmap) build into it.
 
 ### Compilation
 
-```bash
+```
 gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %windir%\system32\advapi32.dll
 ```
 
