@@ -1,1 +1,0 @@
-gcc simple_ftp.c -o ftp.exe -lws2_32
