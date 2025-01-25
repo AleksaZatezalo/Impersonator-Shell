@@ -1,1 +1,0 @@
-gcc winpeas.c -o winpeas.exe -ladvapi32 -luser32 -liphlpapi -lpsapi -lnetapi32
