@@ -6,7 +6,6 @@ A sophisticated security assessment tool that leverages Windows token manipulati
 
 - **Native Token Manipulation**: Utilizes Windows API for token operations without requiring external tools
 - **Zero External Dependencies**: Operates using only native Windows components
-- **Enumeration Capabilities (PENDING)**: The binary has a simplified version of [WinPeas](https://github.com/peass-ng/PEASS-ng/tree/master/winPEAS) and [Nmap](https://github.com/nmap/nmap) build into it.
 
 ### Compilation
 
