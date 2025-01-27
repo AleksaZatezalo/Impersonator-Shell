@@ -4,8 +4,9 @@ A sophisticated security assessment tool that leverages Windows token manipulati
 
 ## Key Features
 
-- **Native Token Manipulation**: Utilizes Windows API for token operations without requiring external tools
-- **Zero External Dependencies**: Operates using only native Windows components
+- **Native Token Manipulation**: Utilizes Windows API for token operations without requiring external tools.
+- **Zero External Dependencies**: Operates using only native Windows components.
+- **Credential Dumping**:  Dumps credentials from the lsass process by using of the MiniDumpWriteDump API Call.
 
 ### Compilation
 
