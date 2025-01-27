@@ -35,22 +35,6 @@ gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %wi
 - Extracting information from the underlying OS
 
 
-## Roadmap
-
-### Planned Features
-
-- Advanced file transfer system with integrity verification
-- LSASS memory analysis capabilities
-- Comprehensive system enumeration module
-- Build automation through Makefile integration
-- Clean up architecture and code styles
-
-### Security Considerations
-
-- Token privilege verification
-- Session isolation
-- Secure communication protocols
-
 ### Contributing
 
 1. **Issue Tracking**: All changes must reference an existing issue
