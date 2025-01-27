@@ -27,13 +27,10 @@ gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %wi
 - Command execution environment
 - Session handling
 
-#### Post Exploitation Operations
+#### LSASS Dumping
 
-- Transfering files between target and attacking machine
-- Downloading files to the target machine
-- Enumerating the target OS
-- Extracting information from the underlying OS
-
+- Dumps password hashes opperated on by the LSASS process
+- Function similar to Mimikatz
 
 ### Contributing
 
@@ -67,3 +64,5 @@ If you have benefited from this project and use Monero please consider donanting
 [Understanding and Abusing Process Tokens — Part I](https://securitytimes.medium.com/understanding-and-abusing-process-tokens-part-i-ee51671f2cfa)
 
 [Understanding and Abusing Process Tokens — Part II](https://securitytimes.medium.com/understanding-and-abusing-access-tokens-part-ii-b9069f432962)
+
+[Dump Passwords from LSASS without Mimikatz!](https://www.youtube.com/watch?v=w5trP4SrLIo&t)
