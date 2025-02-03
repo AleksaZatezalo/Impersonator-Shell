@@ -8,3 +8,16 @@
 #include <Windows.h>
 #include <DbgHelp.h>
 #pragma comment(lib, "DbgHelp.lib")
+
+
+void LSASSDump()
+{
+    HANDLE lsassProcess;
+    int lsassPID = 0;
+    HANDLE DumpFile = CreateFileA("dumpfile.dmp", GENERIC_ALL, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if (!DumpFile) {
+        printf("[!] Dump file created successfully!\n");
+    }
+
+}
