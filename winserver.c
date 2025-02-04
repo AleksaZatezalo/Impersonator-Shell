@@ -45,7 +45,7 @@ int welcomeMessage(int sockfd){
 char *handleInput(char *input){
     char *result;
     if (strstr(input, "help")){
-        result = "Type `help` for help\r\nType `token-info PID` to get token info for process with process ID PID\r\nsType `impersonate PID COMMAND` to impersonate a PID's associated user and execute COMMAND\r\n";
+        result = "Type `help` for help.\r\nType `token-info PID` to get token info for process with process ID PID.\r\nType `impersonate PID COMMAND` to impersonate a PID's associated user and execute COMMAND\r\n";
     } else if (strstr(input, "impersonate") != NULL) {
         char *command = strtok(input, " "); //first_part points to "impersonate"
         int token = atoi(strtok(NULL, " "));   //sec_part points to "token"

