@@ -1,12 +1,17 @@
 # Impersonator Shell
 
-A sophisticated security assessment tool that leverages Windows token manipulation for post-exploitation analysis. This project combines the functionality of traditional penetration testing tools with advanced Windows API integration for seamless privilege escalation capabilities.
+The Impersonator Shell is a post-exploitation security assessment tool that leverages Windows token manipulation. This project combines the functionality of traditional penetration testing tools with advanced Windows API integration for seamless privilege escalation capabilities.
 
 ## Key Features
 
 - **Native Token Manipulation**: Utilizes Windows API for token operations without requiring external tools.
 - **Zero External Dependencies**: Operates using only native Windows components.
-- **Credential Dumping**:  Dumps credentials from the lsass process by using of the MiniDumpWriteDump API Call.
+
+We are looking to expand the Impersonator Shell with the following:
+
+- Dumping passwords with LSASS
+- Maintaining Persistance with the Windows API
+- Process Injection
 
 ### Compilation
 
