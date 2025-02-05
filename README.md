@@ -32,11 +32,6 @@ gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %wi
 - Command execution environment
 - Session handling
 
-#### LSASS Dumping
-
-- Dumps password hashes opperated on by the LSASS process
-- Function similar to Mimikatz
-
 ### Contributing
 
 1. **Issue Tracking**: All changes must reference an existing issue
