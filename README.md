@@ -43,11 +43,6 @@ gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %wi
    - Verify clean compilation
    - Update documentation for interface changes
 
-3. **Testing**
-   - Add test cases for new functionality
-   - Verify existing test suite passes
-   - Document test coverage
-
 ## Donation Link
 
 If you have benefited from this project and use Monero please consider donanting to the following address:
