@@ -42,6 +42,13 @@ gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %wi
    - Remove build artifacts before commits
    - Verify clean compilation
    - Update documentation for interface changes
+  
+## Presentation Information
+
+The Impersonator Shell has been presented at the following conferences:
+
+- BSides Austin 2024
+- Wild West Hack Fest Mile High 2025
 
 ## Donation Link
 
