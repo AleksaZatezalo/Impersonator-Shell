@@ -16,7 +16,7 @@ We are looking to expand the Impersonator Shell with the following:
 ### Compilation
 
 ```
-gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonate -lws2_32 %windir%\system32\advapi32.dll
+gcc .\doexec.c .\main.c .\token_info.c .\winserver.c -o impersonator -lws2_32 %windir%\system32\advapi32.dll
 ```
 
 ### Core Components
