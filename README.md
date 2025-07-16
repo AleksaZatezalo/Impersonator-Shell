@@ -50,11 +50,6 @@ The Impersonator Shell has been presented at the following conferences:
 - BSides Austin 2024
 - Wild West Hack Fest Mile High 2025
 
-## Donation Link
-
-If you have benefited from this project and use Monero please consider donanting to the following address:
-47RoH3K4j8STLSh8ZQ2vUXZdh7GTK6dBy7uEBopegzkp6kK4fBrznkKjE3doTamn3W7A5DHbWXNdjaz2nbZmSmAk8X19ezQ
-
 ## References
 
 [Build Your Own Shell (BYOS) Project](https://github.com/AleksaZatezalo/BYOS)
